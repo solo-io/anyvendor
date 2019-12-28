@@ -18,3 +18,4 @@
 *.out
 vendor/
 _output/
+**/go-mock-reflect*

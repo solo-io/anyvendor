@@ -7,5 +7,5 @@ const (
 	// default directory into which proto, and other files will be vendored.
 	// Originally this was meant to be the vendor directory, but clashes with the go vendor directory
 	// meant it would be easier for this to inhabit it's own folder
-	DefaultDepDir = ".proto"
+	DefaultDepDir = ".proto_vendor"
 )
