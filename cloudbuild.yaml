@@ -1,0 +1,65 @@
+steps:
+
+- name: gcr.io/cloud-builders/gsutil
+  entrypoint: 'bash'
+  args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/protodep/protodep-mod.tar.gz | tar -xzf -']
+  id: 'untar-mod-cache'
+  dir: &dir '/workspace/protodep'
+
+# prepare-workspace to set up the project so it can be built and tested
+- name: 'gcr.io/$PROJECT_ID/prepare-go-workspace:0.2.2'
+  args:
+  - "--repo-owner"
+  - "solo-io"
+  - "--repo-name"
+  - protodep
+  - "--repo-sha"
+  - "$COMMIT_SHA"
+  - "--repo-output-dir"
+  - "."
+  env:
+  - 'GIT_SSH_CONFIG=FALSE'
+  id: 'prepare-workspace'
+
+# download massive container in parallel
+- name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.1'
+  entrypoint: 'bash'
+  dir: *dir
+  args: ['-c', 'ls']
+  waitFor: ['-']
+
+# Installs go executables required by codegen tests
+- name: 'gcr.io/$PROJECT_ID/go-mod-make:0.2.1'
+  args: ['update-deps']
+  waitFor: ['prepare-workspace']
+  id: 'update-deps'
+  dir: *dir
+
+# check code gen for kubernetes custom resources, should be no diff
+- name: 'gcr.io/$PROJECT_ID/go-mod-make:0.2.1'
+  entrypoint: 'bash'
+  args: ['ci/check-code-gen.sh']
+  env:
+  - 'PROJECT_ROOT=github.com/solo-io/protodep'
+  - 'TAGGED_VERSION=$TAG_NAME'
+    #  waitFor: ['update-deps']
+  dir: *dir
+  id: 'check-code-and-docs-gen'
+
+
+# e2e-ginkgo is produced from https://github.com/solo-io/cloud-builders/e2e-ginkgo
+# sets up redis, consul, kubectl, go with required environment variables
+# need to use the provided entrypoint
+- name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.1'
+  args: ['-r', '-v', '-race', '-p', '-compilers=2']
+  dir: *dir
+  id: 'test'
+
+
+timeout: 1500s
+tags: ['protodep']
+options:
+    machineType: 'N1_HIGHCPU_32'
+    volumes:
+    - name: 'gopath'
+      path: '/go'

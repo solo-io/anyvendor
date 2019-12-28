@@ -1,0 +1,4 @@
+changelog:
+- type: NEW_FEATURE
+  description: Create API for protodep.
+  issueLink: https://github.com/solo-io/protodep/issues/1
