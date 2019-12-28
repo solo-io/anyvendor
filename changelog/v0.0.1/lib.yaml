@@ -1,0 +1,4 @@
+changelog:
+- type: NEW_FEATURE
+  description: Expose protodep as a library.
+  issueLink: https://github.com/solo-io/protodep/issues/3
