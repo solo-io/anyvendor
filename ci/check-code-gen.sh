@@ -9,11 +9,8 @@ if [ ! -f .gitignore ]; then
 fi
 
 
-git init
-git config user.email "you@example.com"
+git config --global user.email "you@example.com"
 git config --global user.name "Your Name"
-git add .
-git commit -m "set up dummy repo for diffing" -q
 
 
 PATH=/workspace/gopath/bin:$PATH
