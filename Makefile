@@ -23,10 +23,9 @@ init:
 
 .PHONY: update-deps
 update-deps: mod-download
-	$(shell cd vendor/github.com/solo-io/protoc-gen-ext; make install)
 	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get -u github.com/golang/protobuf/protoc-gen-go
-	GO111MODULE=off go get -u github.com/envoyproxy/protoc-gen-validate
+	GO111MODULE=off go install github.com/envoyproxy/protoc-gen-validate
 	GO111MODULE=off go get -u github.com/golang/mock/gomock
 	GO111MODULE=off go install github.com/golang/mock/mockgen
 
