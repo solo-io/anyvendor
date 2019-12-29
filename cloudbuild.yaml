@@ -4,7 +4,7 @@ steps:
   entrypoint: 'bash'
   args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/protodep/protodep-mod.tar.gz | tar -xzf -']
   id: 'untar-mod-cache'
-  dir: &dir '/workspace/protodep'
+  dir: &dir '/workspace/repo/protodep'
 
 # prepare-workspace to set up the project so it can be built and tested
 - name: 'gcr.io/$PROJECT_ID/prepare-go-workspace:0.2.2'
@@ -16,7 +16,7 @@ steps:
   - "--repo-sha"
   - "$COMMIT_SHA"
   - "--repo-output-dir"
-  - "."
+  - "repo"
   env:
   - 'GIT_SSH_CONFIG=FALSE'
   id: 'prepare-workspace'
