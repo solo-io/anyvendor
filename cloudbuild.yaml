@@ -56,6 +56,15 @@ steps:
   id: 'test'
 
 
+# make cli
+- name: 'gcr.io/$PROJECT_ID/go-mod-make:0.2.1'
+  args: ['cli']
+  env:
+  - 'TAGGED_VERSION=$TAG_NAME'
+  dir: *dir
+  id: 'cli'
+
+
 timeout: 1500s
 tags: ['protodep']
 options:

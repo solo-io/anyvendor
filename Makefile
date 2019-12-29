@@ -49,3 +49,12 @@ $(OUTPUT_DIR)/.generated-code:
 	gofmt -w $(SUBDIRS)
 	goimports -w $(SUBDIRS)
 	touch $@
+#----------------------------------------------------------------------------------
+# Cli
+#----------------------------------------------------------------------------------
+
+.PHONY: cli
+cli: $(OUTPUT_DIR)/protodep
+
+$(OUTPUT_DIR)/protodep:
+	go build -o $@ main.go
