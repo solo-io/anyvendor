@@ -4,6 +4,12 @@ option go_package = "github.com/solo-io/anyvendor/anyvendor";
 
 import "validate/validate.proto";
 
+/*
+    Config object used for running anyvendor. The top level config consists of 2 main sections.
+
+    Local is a set of matchers will be taken directly from the local module, and vendored in.
+    Imports is a list of import types which will be run, and then vendored.
+*/
 message Config {
     Local local = 1;
 
@@ -17,10 +23,21 @@ message Import {
     }
 }
 
+// A set of glob patters to be grabbed from the current module
 message Local {
-    repeated string patterns = 1;
+    repeated string patterns = 1 [(validate.rules).repeated = { min_items: 1}];
 }
 
+/*
+    A go mod import represents a set of imports from a go module
+
+    patterns is a set glob matchers to find files in a go module.
+
+    package is the name of the go module which these should be pulled from.
+
+    The GoModImport uses the command `go list -f '{{.Path}}' -m  all` to find
+    all of the package names
+*/
 message GoModImport {
     repeated string patterns = 1 [(validate.rules).repeated = { min_items: 1}];
     string package = 2 [(validate.rules).string = { min_len: 1}];

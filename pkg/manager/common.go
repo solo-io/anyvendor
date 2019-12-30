@@ -22,7 +22,6 @@ import (
 type FileCopier interface {
 	Copy(src, dst string) (int64, error)
 	GetMatches(copyPat []string, dir string) ([]string, error)
-	PkgModPath(importPath, version string) string
 }
 
 var matchListFilter = fmt.Sprintf("%s/", anyvendor.DefaultDepDir)

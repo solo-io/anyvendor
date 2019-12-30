@@ -34,7 +34,7 @@ var _ = Describe("anyvendor", func() {
 	})
 
 	Context("helper functions", func() {
-		FContext("handleSingleModule", func() {
+		Context("handleSingleModule", func() {
 			type testCase struct {
 				nonSplitImport string
 				splitImport    []string
@@ -42,40 +42,16 @@ var _ = Describe("anyvendor", func() {
 				setupMocks     func(mockFs *mock_manager.MockFs, mockCp *mock_manager.MockFileCopier)
 			}
 			var (
-				mockFs  *mock_manager.MockFs
-				mockCp  *mock_manager.MockFileCopier
-				fakeErr = eris.New("test error")
-
-				standardImport = "github.com/envoyproxy/protoc-gen-validate v0.1.0"
-				// replacedImport = "k8s.io/api v0.0.0-20191121015604-11707872ac1c => k8s.io/api v0.0.0-20191004120104-195af9ec3521"
-				// localImport    = "k8s.io/api v0.0.0-20191121015604-11707872ac1c => /path/to/local"
-
-				// testCases = []testCase{
-				// 	{
-				// 		nonSplitImport: standardImport,
-				// 		splitImport:    strings.Split(standardImport, " "),
-				// 		err:            fakeErr,
-				// 		setupMocks: func(mockFs *mock_manager.MockFs, mockCp *mock_manager.MockFileCopier) {
-				// 			mockCp.EXPECT().PkgModPath()
-				// 			mockFs.EXPECT().Stat()
-				// 		},
-				// 	},
-				// 	{
-				// 		nonSplitImport: standardImport,
-				// 		splitImport:    strings.Split(standardImport, " "),
-				// 		err:            nil,
-				// 	},
-				// 	{
-				// 		nonSplitImport: replacedImport,
-				// 		splitImport:    strings.Split(replacedImport, " "),
-				// 		err:            nil,
-				// 	},
-				// 	{
-				// 		nonSplitImport: localImport,
-				// 		splitImport:    strings.Split(localImport, " "),
-				// 		err:            nil,
-				// 	},
-				// }
+				mockFs         *mock_manager.MockFs
+				mockCp         *mock_manager.MockFileCopier
+				fakeErr        = eris.New("test error")
+				fakeDir        = "fake/dir"
+				standardModule = &modutils.Module{
+					Path:     "github.com/envoyproxy/protoc-gen-validate",
+					Version:  "v0.1.0",
+					Indirect: false,
+					Dir:      fakeDir,
+				}
 			)
 			BeforeEach(func() {
 				mockCp = mock_manager.NewMockFileCopier(ctrl)
@@ -87,46 +63,34 @@ var _ = Describe("anyvendor", func() {
 			})
 			Context("basic import", func() {
 				It("will error if dir does not exist", func() {
-					fakeDir := "fake/dir"
-					splitStandard := strings.Split(standardImport, " ")
-					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
 					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
-					_, err := mgr.handleSingleModule(splitStandard, nil)
+					_, err := mgr.handleSingleModule(standardModule, nil)
 					Expect(err).To(HaveOccurred())
 					Expect(eris.Cause(err).Error()).To(Equal(os.ErrNotExist.Error()))
 				})
 				It("nil match opts, will error if get matches fails", func() {
-					fakeDir := "fake/dir"
-					splitStandard := strings.Split(standardImport, " ")
-					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
 					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
 					mockCp.EXPECT().GetMatches(gomock.Any(), gomock.Any()).Return(nil, fakeErr)
-					_, err := mgr.handleSingleModule(splitStandard, nil)
+					_, err := mgr.handleSingleModule(standardModule, nil)
 					Expect(err).To(HaveOccurred())
 					Expect(eris.Cause(err)).To(Equal(fakeErr))
 				})
 				It("nil match opts", func() {
-					fakeDir := "fake/dir"
-					splitStandard := strings.Split(standardImport, " ")
 					vendorList := []string{"vendorLIst"}
-					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
 					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
 					mockCp.EXPECT().GetMatches(DefaultMatchPatterns, fakeDir).Return(vendorList, nil)
-					mod, err := mgr.handleSingleModule(splitStandard, nil)
+					mod, err := mgr.handleSingleModule(standardModule, nil)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(mod.VendorList).To(Equal(vendorList))
-					Expect(mod.Dir).To(Equal(fakeDir))
+					Expect(mod.vendorList).To(Equal(vendorList))
+					Expect(mod.module.Dir).To(Equal(fakeDir))
 				})
 				It("real match opts, will error if get matches fails", func() {
 					matchOptions := []*anyvendor.GoModImport{
 						EnvoyValidateProtoMatcher,
 					}
-					fakeDir := "fake/dir"
-					splitStandard := strings.Split(standardImport, " ")
-					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
 					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
 					mockCp.EXPECT().GetMatches(gomock.Any(), gomock.Any()).Return(nil, fakeErr)
-					_, err := mgr.handleSingleModule(splitStandard, matchOptions)
+					_, err := mgr.handleSingleModule(standardModule, matchOptions)
 					Expect(err).To(HaveOccurred())
 					Expect(eris.Cause(err)).To(Equal(fakeErr))
 				})
@@ -134,16 +98,13 @@ var _ = Describe("anyvendor", func() {
 					matchOptions := []*anyvendor.GoModImport{
 						EnvoyValidateProtoMatcher,
 					}
-					fakeDir := "fake/dir"
-					splitStandard := strings.Split(standardImport, " ")
 					vendorList := []string{"vendorLIst"}
-					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
 					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
 					mockCp.EXPECT().GetMatches(matchOptions[0].Patterns, fakeDir).Return(vendorList, nil)
-					mod, err := mgr.handleSingleModule(splitStandard, matchOptions)
+					mod, err := mgr.handleSingleModule(standardModule, matchOptions)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(mod.VendorList).To(Equal(vendorList))
-					Expect(mod.Dir).To(Equal(fakeDir))
+					Expect(mod.vendorList).To(Equal(vendorList))
+					Expect(mod.module.Dir).To(Equal(fakeDir))
 				})
 			})
 			Context("replaced import", func() {
@@ -154,9 +115,10 @@ var _ = Describe("anyvendor", func() {
 
 			})
 		})
+
 		Context("copy", func() {
 			type testCase struct {
-				mod        *Module
+				mod        *moduleWithImports
 				vendorFile string
 				localFile  string
 				err        error
@@ -175,15 +137,18 @@ var _ = Describe("anyvendor", func() {
 				fakeErr := eris.New("test error")
 				testCases := []testCase{
 					{
-						mod: &Module{
-							VendorList: []string{"test"},
+						mod: &moduleWithImports{
+							vendorList: []string{"test"},
+							module:     &modutils.Module{},
 						},
 						err: fakeErr,
 					},
 					{
-						mod: &Module{
-							VendorList:     []string{"test"},
-							currentPackage: true,
+						mod: &moduleWithImports{
+							vendorList: []string{"test"},
+							module: &modutils.Module{
+								Main: true,
+							},
 						},
 						err: fakeErr,
 					},
@@ -191,7 +156,7 @@ var _ = Describe("anyvendor", func() {
 				// input isn't important here, just checking for error state
 				mockCp.EXPECT().Copy(gomock.Any(), gomock.Any()).Times(2).Return(int64(0), fakeErr)
 				for _, v := range testCases {
-					err := mgr.copy([]*Module{v.mod})
+					err := mgr.copy([]*moduleWithImports{v.mod})
 					Expect(eris.Cause(err)).To(Equal(fakeErr))
 				}
 			})
@@ -199,18 +164,20 @@ var _ = Describe("anyvendor", func() {
 				testDir := "/fake/test/dir"
 				importPath := "/import/path"
 				tc := &testCase{
-					mod: &Module{
-						ImportPath:     importPath,
-						Dir:            testDir,
-						VendorList:     []string{filepath.Join(testDir, "package", "1", "hello.proto")},
-						currentPackage: true,
+					mod: &moduleWithImports{
+						module: &modutils.Module{
+							Path: importPath,
+							Dir:  testDir,
+							Main: true,
+						},
+						vendorList: []string{filepath.Join(testDir, "package", "1", "hello.proto")},
 					},
 					vendorFile: "/fake/test/dir/package/1/hello.proto",
-					localFile:  "/fake/test/dir/vendor_proto/import/path/package/1/hello.proto",
+					localFile:  "/fake/test/dir/vendor_any/import/path/package/1/hello.proto",
 				}
 				mgr.WorkingDirectory = testDir
 				mockCp.EXPECT().Copy(tc.vendorFile, tc.localFile).Return(int64(0), nil)
-				Expect(mgr.copy([]*Module{tc.mod})).NotTo(HaveOccurred())
+				Expect(mgr.copy([]*moduleWithImports{tc.mod})).NotTo(HaveOccurred())
 
 			})
 			Context("multiple standard", func() {
@@ -219,22 +186,26 @@ var _ = Describe("anyvendor", func() {
 					importPath = "/import/path"
 					testCases  = []testCase{
 						{
-							mod: &Module{
-								ImportPath: importPath,
-								Dir:        testDir,
-								VendorList: []string{filepath.Join(testDir, "package", "1", "hello.proto")},
+							mod: &moduleWithImports{
+								module: &modutils.Module{
+									Path: importPath,
+									Dir:  testDir,
+								},
+								vendorList: []string{filepath.Join(testDir, "package", "1", "hello.proto")},
 							},
 							vendorFile: "/fake/test/dir/package/1/hello.proto",
-							localFile:  "vendor_proto/import/path/package/1/hello.proto",
+							localFile:  "vendor_any/import/path/package/1/hello.proto",
 						},
 						{
-							mod: &Module{
-								ImportPath: importPath,
-								Dir:        testDir,
-								VendorList: []string{filepath.Join(testDir, "package", "2", "hello.proto")},
+							mod: &moduleWithImports{
+								module: &modutils.Module{
+									Path: importPath,
+									Dir:  testDir,
+								},
+								vendorList: []string{filepath.Join(testDir, "package", "2", "hello.proto")},
 							},
 							vendorFile: "/fake/test/dir/package/2/hello.proto",
-							localFile:  "vendor_proto/import/path/package/2/hello.proto",
+							localFile:  "vendor_any/import/path/package/2/hello.proto",
 						},
 					}
 				)
@@ -242,7 +213,7 @@ var _ = Describe("anyvendor", func() {
 				for i, v := range testCases {
 					It(fmt.Sprintf("testcase %d", i), func() {
 						mockCp.EXPECT().Copy(v.vendorFile, v.localFile).Return(int64(0), nil)
-						Expect(mgr.copy([]*Module{v.mod})).NotTo(HaveOccurred())
+						Expect(mgr.copy([]*moduleWithImports{v.mod})).NotTo(HaveOccurred())
 					})
 				}
 			})
@@ -268,8 +239,8 @@ var _ = Describe("anyvendor", func() {
 			})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(modules).To(HaveLen(2))
-			Expect(modules[0].ImportPath).To(Equal(EnvoyValidateProtoMatcher.Package))
-			Expect(modules[1].ImportPath).To(Equal("github.com/solo-io/anyvendor"))
+			Expect(modules[0].module.Path).To(Equal("github.com/solo-io/anyvendor"))
+			Expect(modules[1].module.Path).To(Equal(EnvoyValidateProtoMatcher.Package))
 			Expect(mgr.copy(modules)).NotTo(HaveOccurred())
 		})
 	})

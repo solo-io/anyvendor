@@ -62,17 +62,3 @@ func (mr *MockFileCopierMockRecorder) GetMatches(copyPat, dir interface{}) *gomo
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMatches", reflect.TypeOf((*MockFileCopier)(nil).GetMatches), copyPat, dir)
 }
-
-// PkgModPath mocks base method
-func (m *MockFileCopier) PkgModPath(importPath, version string) string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PkgModPath", importPath, version)
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// PkgModPath indicates an expected call of PkgModPath
-func (mr *MockFileCopierMockRecorder) PkgModPath(importPath, version interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PkgModPath", reflect.TypeOf((*MockFileCopier)(nil).PkgModPath), importPath, version)
-}

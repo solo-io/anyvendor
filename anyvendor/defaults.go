@@ -9,5 +9,5 @@ const (
 	// meant it would be easier for this to inhabit it's own folder
 	// See this section for more info: https://tip.golang.org/doc/go1.14#go-command
 	// This tool should not force to projects to build using vendor.
-	DefaultDepDir = "anyvendor"
+	DefaultDepDir = "vendor_any"
 )
