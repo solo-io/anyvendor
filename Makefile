@@ -41,7 +41,7 @@ mod-download:
 .PHONY: generated-code
 generated-code: $(OUTPUT_DIR)/.generated-code
 
-SUBDIRS:=pkg test
+SUBDIRS:=pkg
 $(OUTPUT_DIR)/.generated-code:
 	mkdir -p ${OUTPUT_DIR}
 	$(GO_BUILD_FLAGS) go generate ./...

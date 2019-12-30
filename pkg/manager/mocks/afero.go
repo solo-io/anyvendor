@@ -5,11 +5,12 @@
 package mock_manager
 
 import (
-	gomock "github.com/golang/mock/gomock"
-	afero "github.com/spf13/afero"
 	os "os"
 	reflect "reflect"
 	time "time"
+
+	gomock "github.com/golang/mock/gomock"
+	afero "github.com/spf13/afero"
 )
 
 // MockFs is a mock of Fs interface

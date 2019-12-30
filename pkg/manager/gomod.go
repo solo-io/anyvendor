@@ -277,23 +277,21 @@ func (m *goModFactory) copy(modules []*Module) error {
 						err.Error(), vendorFile))
 				}
 			}
-		}
-		for _, vendorFile := range mod.VendorList {
-			x := strings.Index(vendorFile, mod.Dir)
-			if x < 0 {
-				return eris.New("Error! vendor file doesn't belong to mod, strange.")
-			}
-
-			localPath := filepath.Join(mod.ImportPath, vendorFile[len(mod.Dir):])
-			localFile := filepath.Join(m.WorkingDirectory, protodep.DefaultDepDir, localPath)
-			if _, err := m.cp.Copy(vendorFile, localFile); err != nil {
-				return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
-					err.Error(), vendorFile))
+		} else {
+			for _, vendorFile := range mod.VendorList {
+				localPath := filepath.Join(mod.ImportPath, vendorFile[len(mod.Dir):])
+				localFile := filepath.Join(m.WorkingDirectory, protodep.DefaultDepDir, localPath)
+				if _, err := m.cp.Copy(vendorFile, localFile); err != nil {
+					return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
+						err.Error(), vendorFile))
+				}
 			}
 		}
 	}
 	return nil
 }
+
+var matchListFilter = fmt.Sprintf("%s/", protodep.DefaultDepDir)
 
 func buildMatchList(copyPat []string, dir string) ([]string, error) {
 	var vendorList []string
@@ -306,7 +304,7 @@ func buildMatchList(copyPat []string, dir string) ([]string, error) {
 		// Filter out all matches which contain a vendor folder, those are leftovers from a previous run.
 		// Might be worth clearing the vendor folder before every run.
 		for _, match := range matches {
-			vendorFolders := strings.Count(match, protodep.DefaultDepDir)
+			vendorFolders := strings.Count(match, matchListFilter)
 			if vendorFolders > 0 {
 				continue
 			}
