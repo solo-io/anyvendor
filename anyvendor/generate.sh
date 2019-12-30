@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# script to generate anyvendor.proto
 
 set -e
 
@@ -39,6 +40,6 @@ protoc ${IMPORTS} \
     ${VALIDATE_FLAG} \
     ${INPUT_PROTOS}
 
-cp -r  ${TEMP_DIR}/github.com/solo-io/protodep/* ${ROOT}
+cp -r  ${TEMP_DIR}/github.com/solo-io/anyvendor/* ${ROOT}
 
 goimports -w .

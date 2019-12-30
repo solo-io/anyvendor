@@ -1,4 +1,4 @@
-module github.com/solo-io/protodep
+module github.com/solo-io/anyvendor
 
 go 1.13
 

@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rotisserie/eris"
-	mock_manager "github.com/solo-io/protodep/pkg/manager/mocks"
+	mock_manager "github.com/solo-io/anyvendor/pkg/manager/mocks"
 	"github.com/spf13/afero"
 )
 

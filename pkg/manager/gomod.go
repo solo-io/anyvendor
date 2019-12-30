@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/rotisserie/eris"
-	"github.com/solo-io/protodep/pkg/modutils"
-	"github.com/solo-io/protodep/protodep"
+	"github.com/solo-io/anyvendor/anyvendor"
+	"github.com/solo-io/anyvendor/pkg/modutils"
 	"github.com/spf13/afero"
 )
 
@@ -24,7 +24,7 @@ var (
 )
 
 type goModOptions struct {
-	MatchOptions  []*protodep.GoModImport
+	MatchOptions  []*anyvendor.GoModImport
 	LocalMatchers []string
 }
 
@@ -62,8 +62,8 @@ type goModFactory struct {
 	fileCopier       FileCopier
 }
 
-func (m *goModFactory) Ensure(ctx context.Context, opts *protodep.Config) error {
-	var packages []*protodep.GoModImport
+func (m *goModFactory) Ensure(ctx context.Context, opts *anyvendor.Config) error {
+	var packages []*anyvendor.GoModImport
 	for _, cfg := range opts.Imports {
 		if cfg.GetGoMod() != nil {
 			packages = append(packages, cfg.GetGoMod())
@@ -100,7 +100,7 @@ func (m *goModFactory) gather(opts goModOptions) ([]*Module, error) {
 		return nil, err
 	}
 
-	modPackageReader, err := modutils.GetCurrentPackageList()
+	modPackageReader, err := modutils.GetCurrentPackageListAll()
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (m *goModFactory) gather(opts goModOptions) ([]*Module, error) {
 	// Clear first line as it is current package name
 	scanner.Scan()
 
-	modules := []*Module{}
+	var modules []*Module
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -148,9 +148,9 @@ func (m *goModFactory) gather(opts goModOptions) ([]*Module, error) {
 	return modules, nil
 }
 
-func (m *goModFactory) handleSingleModule(s []string, matchOptions []*protodep.GoModImport) (*Module, error) {
+func (m *goModFactory) handleSingleModule(s []string, matchOptions []*anyvendor.GoModImport) (*Module, error) {
 	/*
-		the packages come in 3 varities
+		the packages come in 3 varieties
 		1. helm.sh/helm/v3 v3.0.0
 		2. k8s.io/api v0.0.0-20191121015604-11707872ac1c => k8s.io/api v0.0.0-20191004120104-195af9ec3521
 		3. k8s.io/api v0.0.0-20191121015604-11707872ac1c => /path/to/local
@@ -220,7 +220,7 @@ func (m *goModFactory) copy(modules []*Module) error {
 		if mod.currentPackage == true {
 			for _, vendorFile := range mod.VendorList {
 				localPath := strings.TrimPrefix(vendorFile, m.WorkingDirectory+"/")
-				localFile := filepath.Join(m.WorkingDirectory, protodep.DefaultDepDir, mod.ImportPath, localPath)
+				localFile := filepath.Join(m.WorkingDirectory, anyvendor.DefaultDepDir, mod.ImportPath, localPath)
 				if _, err := m.fileCopier.Copy(vendorFile, localFile); err != nil {
 					return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
 						err.Error(), vendorFile))
@@ -229,7 +229,7 @@ func (m *goModFactory) copy(modules []*Module) error {
 		} else {
 			for _, vendorFile := range mod.VendorList {
 				localPath := filepath.Join(mod.ImportPath, vendorFile[len(mod.Dir):])
-				localFile := filepath.Join(m.WorkingDirectory, protodep.DefaultDepDir, localPath)
+				localFile := filepath.Join(m.WorkingDirectory, anyvendor.DefaultDepDir, localPath)
 				if _, err := m.fileCopier.Copy(vendorFile, localFile); err != nil {
 					return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
 						err.Error(), vendorFile))

@@ -11,7 +11,7 @@ import (
 
 	"github.com/mattn/go-zglob"
 	"github.com/rotisserie/eris"
-	"github.com/solo-io/protodep/protodep"
+	"github.com/solo-io/anyvendor/anyvendor"
 	"github.com/spf13/afero"
 )
 
@@ -25,7 +25,7 @@ type FileCopier interface {
 	PkgModPath(importPath, version string) string
 }
 
-var matchListFilter = fmt.Sprintf("%s/", protodep.DefaultDepDir)
+var matchListFilter = fmt.Sprintf("%s/", anyvendor.DefaultDepDir)
 
 type copier struct {
 	fs afero.Fs

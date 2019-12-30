@@ -1,6 +1,6 @@
 syntax = "proto3";
-package protodep;
-option go_package = "github.com/solo-io/protodep/protodep";
+package anyvendor;
+option go_package = "github.com/solo-io/anyvendor/anyvendor";
 
 import "validate/validate.proto";
 

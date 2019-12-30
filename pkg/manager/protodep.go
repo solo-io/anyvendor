@@ -3,7 +3,7 @@ package manager
 import (
 	"context"
 
-	"github.com/solo-io/protodep/protodep"
+	"github.com/solo-io/anyvendor/anyvendor"
 )
 
 /*
@@ -11,12 +11,12 @@ import (
 	for non-go vendored files.
 */
 type depFactory interface {
-	Ensure(ctx context.Context, opts *protodep.Config) error
+	Ensure(ctx context.Context, opts *anyvendor.Config) error
 }
 
 /*
 	The manager is the external facing object that will be responsible for ensuring
-	a given protodep config, as outlined by the `protodep.Config` object.
+	a given anyvendor config, as outlined by the `anyvendor.Config` object.
 */
 type Manager struct {
 	depFactories []depFactory
@@ -37,7 +37,7 @@ func NewManager(ctx context.Context, cwd string) (*Manager, error) {
 	}, nil
 }
 
-func (m *Manager) Ensure(ctx context.Context, opts *protodep.Config) error {
+func (m *Manager) Ensure(ctx context.Context, opts *anyvendor.Config) error {
 	if err := opts.Validate(); err != nil {
 		return err
 	}

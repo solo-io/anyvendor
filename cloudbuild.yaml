@@ -2,9 +2,9 @@ steps:
 
 - name: gcr.io/cloud-builders/gsutil
   entrypoint: 'bash'
-  args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/protodep/protodep-mod.tar.gz | tar -xzf -']
+  args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/anyvendor/anyvendor-mod.tar.gz | tar -xzf -']
   id: 'untar-mod-cache'
-  dir: &dir '/workspace/repo/protodep'
+  dir: &dir '/workspace/repo/anyvendor'
 
 # prepare-workspace to set up the project so it can be built and tested
 - name: 'gcr.io/$PROJECT_ID/prepare-go-workspace:0.2.2'
@@ -12,7 +12,7 @@ steps:
   - "--repo-owner"
   - "solo-io"
   - "--repo-name"
-  - protodep
+  - anyvendor
   - "--repo-sha"
   - "$COMMIT_SHA"
   - "--repo-output-dir"
@@ -40,7 +40,7 @@ steps:
   entrypoint: 'bash'
   args: ['ci/check-code-gen.sh']
   env:
-  - 'PROJECT_ROOT=github.com/solo-io/protodep'
+  - 'PROJECT_ROOT=github.com/solo-io/anyvendor'
   - 'TAGGED_VERSION=$TAG_NAME'
     #  waitFor: ['update-deps']
   dir: *dir
@@ -57,7 +57,7 @@ steps:
 
 
 timeout: 1500s
-tags: ['protodep']
+tags: ['anyvendor']
 options:
     machineType: 'N1_HIGHCPU_32'
     volumes:

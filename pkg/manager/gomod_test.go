@@ -10,18 +10,18 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rotisserie/eris"
-	mock_manager "github.com/solo-io/protodep/pkg/manager/mocks"
-	"github.com/solo-io/protodep/pkg/modutils"
-	"github.com/solo-io/protodep/protodep"
+	"github.com/solo-io/anyvendor/anyvendor"
+	mock_manager "github.com/solo-io/anyvendor/pkg/manager/mocks"
+	"github.com/solo-io/anyvendor/pkg/modutils"
 )
 
-var _ = Describe("protodep", func() {
+var _ = Describe("anyvendor", func() {
 	var (
 		modPathString string
 		mgr           *goModFactory
 		ctrl          *gomock.Controller
 
-		EnvoyValidateProtoMatcher = &protodep.GoModImport{
+		EnvoyValidateProtoMatcher = &anyvendor.GoModImport{
 			Package:  "github.com/envoyproxy/protoc-gen-validate",
 			Patterns: []string{"validate/*.proto"},
 		}
@@ -46,7 +46,7 @@ var _ = Describe("protodep", func() {
 				mockCp  *mock_manager.MockFileCopier
 				fakeErr = eris.New("test error")
 
-				standardImport = "helm.sh/helm/v3 v3.0.0"
+				standardImport = "github.com/envoyproxy/protoc-gen-validate v0.1.0"
 				// replacedImport = "k8s.io/api v0.0.0-20191121015604-11707872ac1c => k8s.io/api v0.0.0-20191004120104-195af9ec3521"
 				// localImport    = "k8s.io/api v0.0.0-20191121015604-11707872ac1c => /path/to/local"
 
@@ -118,33 +118,40 @@ var _ = Describe("protodep", func() {
 					Expect(mod.Dir).To(Equal(fakeDir))
 				})
 				It("real match opts, will error if get matches fails", func() {
-					matchOptions := []*protodep.GoModImport{
+					matchOptions := []*anyvendor.GoModImport{
 						EnvoyValidateProtoMatcher,
 					}
 					fakeDir := "fake/dir"
 					splitStandard := strings.Split(standardImport, " ")
 					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
-					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
 					mockCp.EXPECT().GetMatches(gomock.Any(), gomock.Any()).Return(nil, fakeErr)
 					_, err := mgr.handleSingleModule(splitStandard, matchOptions)
 					Expect(err).To(HaveOccurred())
 					Expect(eris.Cause(err)).To(Equal(fakeErr))
 				})
 				It("real match opts", func() {
-					matchOptions := []*protodep.GoModImport{
+					matchOptions := []*anyvendor.GoModImport{
 						EnvoyValidateProtoMatcher,
 					}
 					fakeDir := "fake/dir"
 					splitStandard := strings.Split(standardImport, " ")
 					vendorList := []string{"vendorLIst"}
 					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
-					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
-					mockCp.EXPECT().GetMatches(matchOptions, fakeDir).Return(vendorList, nil)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
+					mockCp.EXPECT().GetMatches(matchOptions[0].Patterns, fakeDir).Return(vendorList, nil)
 					mod, err := mgr.handleSingleModule(splitStandard, matchOptions)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(mod.VendorList).To(Equal(vendorList))
 					Expect(mod.Dir).To(Equal(fakeDir))
 				})
+			})
+			Context("replaced import", func() {
+
+			})
+
+			Context("local import", func() {
+
 			})
 		})
 		Context("copy", func() {
@@ -254,15 +261,15 @@ var _ = Describe("protodep", func() {
 		})
 		It("can vendor protos", func() {
 			modules, err := mgr.gather(goModOptions{
-				MatchOptions: []*protodep.GoModImport{
+				MatchOptions: []*anyvendor.GoModImport{
 					EnvoyValidateProtoMatcher,
 				},
-				LocalMatchers: []string{"protodep/**/*.proto"},
+				LocalMatchers: []string{"anyvendor/**/*.proto"},
 			})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(modules).To(HaveLen(2))
 			Expect(modules[0].ImportPath).To(Equal(EnvoyValidateProtoMatcher.Package))
-			Expect(modules[1].ImportPath).To(Equal("github.com/solo-io/protodep"))
+			Expect(modules[1].ImportPath).To(Equal("github.com/solo-io/anyvendor"))
 			Expect(mgr.copy(modules)).NotTo(HaveOccurred())
 		})
 	})
