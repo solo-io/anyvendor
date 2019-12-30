@@ -20,6 +20,11 @@ var _ = Describe("protodep", func() {
 		modPathString string
 		mgr           *goModFactory
 		ctrl          *gomock.Controller
+
+		EnvoyValidateProtoMatcher = &protodep.GoModImport{
+			Package:  "github.com/envoyproxy/protoc-gen-validate",
+			Patterns: []string{"validate/*.proto"},
+		}
 	)
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
@@ -29,22 +34,117 @@ var _ = Describe("protodep", func() {
 	})
 
 	Context("helper functions", func() {
-		Context("pkgModPath", func() {
-			It("can translate a pkgModPath with a !", func() {
-				importPath := "github.com/Microsoft/package"
-				version := "this_is_a_hash"
-				result := pkgModPath(importPath, version)
-				resultTest := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod",
-					fmt.Sprintf("%s@%s", "github.com/!microsoft/package", version))
-				Expect(result).To(Equal(resultTest))
+		FContext("handleSingleModule", func() {
+			type testCase struct {
+				nonSplitImport string
+				splitImport    []string
+				err            error
+				setupMocks     func(mockFs *mock_manager.MockFs, mockCp *mock_manager.MockFileCopier)
+			}
+			var (
+				mockFs  *mock_manager.MockFs
+				mockCp  *mock_manager.MockFileCopier
+				fakeErr = eris.New("test error")
+
+				standardImport = "helm.sh/helm/v3 v3.0.0"
+				// replacedImport = "k8s.io/api v0.0.0-20191121015604-11707872ac1c => k8s.io/api v0.0.0-20191004120104-195af9ec3521"
+				// localImport    = "k8s.io/api v0.0.0-20191121015604-11707872ac1c => /path/to/local"
+
+				// testCases = []testCase{
+				// 	{
+				// 		nonSplitImport: standardImport,
+				// 		splitImport:    strings.Split(standardImport, " "),
+				// 		err:            fakeErr,
+				// 		setupMocks: func(mockFs *mock_manager.MockFs, mockCp *mock_manager.MockFileCopier) {
+				// 			mockCp.EXPECT().PkgModPath()
+				// 			mockFs.EXPECT().Stat()
+				// 		},
+				// 	},
+				// 	{
+				// 		nonSplitImport: standardImport,
+				// 		splitImport:    strings.Split(standardImport, " "),
+				// 		err:            nil,
+				// 	},
+				// 	{
+				// 		nonSplitImport: replacedImport,
+				// 		splitImport:    strings.Split(replacedImport, " "),
+				// 		err:            nil,
+				// 	},
+				// 	{
+				// 		nonSplitImport: localImport,
+				// 		splitImport:    strings.Split(localImport, " "),
+				// 		err:            nil,
+				// 	},
+				// }
+			)
+			BeforeEach(func() {
+				mockCp = mock_manager.NewMockFileCopier(ctrl)
+				mockFs = mock_manager.NewMockFs(ctrl)
+				mgr = &goModFactory{
+					fileCopier: mockCp,
+					fs:         mockFs,
+				}
 			})
-			It("can translate a standard pkgModPath", func() {
-				importPath := "github.com/microsoft/package"
-				version := "this_is_a_hash"
-				result := pkgModPath(importPath, version)
-				resultTest := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod",
-					fmt.Sprintf("%s@%s", importPath, version))
-				Expect(result).To(Equal(resultTest))
+			Context("basic import", func() {
+				It("will error if dir does not exist", func() {
+					fakeDir := "fake/dir"
+					splitStandard := strings.Split(standardImport, " ")
+					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
+					_, err := mgr.handleSingleModule(splitStandard, nil)
+					Expect(err).To(HaveOccurred())
+					Expect(eris.Cause(err).Error()).To(Equal(os.ErrNotExist.Error()))
+				})
+				It("nil match opts, will error if get matches fails", func() {
+					fakeDir := "fake/dir"
+					splitStandard := strings.Split(standardImport, " ")
+					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
+					mockCp.EXPECT().GetMatches(gomock.Any(), gomock.Any()).Return(nil, fakeErr)
+					_, err := mgr.handleSingleModule(splitStandard, nil)
+					Expect(err).To(HaveOccurred())
+					Expect(eris.Cause(err)).To(Equal(fakeErr))
+				})
+				It("nil match opts", func() {
+					fakeDir := "fake/dir"
+					splitStandard := strings.Split(standardImport, " ")
+					vendorList := []string{"vendorLIst"}
+					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
+					mockCp.EXPECT().GetMatches(DefaultMatchPatterns, fakeDir).Return(vendorList, nil)
+					mod, err := mgr.handleSingleModule(splitStandard, nil)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(mod.VendorList).To(Equal(vendorList))
+					Expect(mod.Dir).To(Equal(fakeDir))
+				})
+				It("real match opts, will error if get matches fails", func() {
+					matchOptions := []*protodep.GoModImport{
+						EnvoyValidateProtoMatcher,
+					}
+					fakeDir := "fake/dir"
+					splitStandard := strings.Split(standardImport, " ")
+					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
+					mockCp.EXPECT().GetMatches(gomock.Any(), gomock.Any()).Return(nil, fakeErr)
+					_, err := mgr.handleSingleModule(splitStandard, matchOptions)
+					Expect(err).To(HaveOccurred())
+					Expect(eris.Cause(err)).To(Equal(fakeErr))
+				})
+				It("real match opts", func() {
+					matchOptions := []*protodep.GoModImport{
+						EnvoyValidateProtoMatcher,
+					}
+					fakeDir := "fake/dir"
+					splitStandard := strings.Split(standardImport, " ")
+					vendorList := []string{"vendorLIst"}
+					mockCp.EXPECT().PkgModPath(splitStandard[0], splitStandard[1]).Return(fakeDir)
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
+					mockCp.EXPECT().GetMatches(matchOptions, fakeDir).Return(vendorList, nil)
+					mod, err := mgr.handleSingleModule(splitStandard, matchOptions)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(mod.VendorList).To(Equal(vendorList))
+					Expect(mod.Dir).To(Equal(fakeDir))
+				})
 			})
 		})
 		Context("copy", func() {
@@ -60,7 +160,7 @@ var _ = Describe("protodep", func() {
 			BeforeEach(func() {
 				mockCp = mock_manager.NewMockFileCopier(ctrl)
 				mgr = &goModFactory{
-					cp: mockCp,
+					fileCopier: mockCp,
 				}
 			})
 
