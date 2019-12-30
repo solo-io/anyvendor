@@ -93,7 +93,7 @@ func (m *goModFactory) gather(opts goModOptions) ([]*moduleWithImports, error) {
 	for _, v := range opts.MatchOptions {
 		moduleNames = append(moduleNames, v.Package)
 	}
-	moduleNames = append(moduleNames, packageName)
+	moduleNames = append([]string{packageName}, moduleNames...)
 	modPackages, err := modutils.GetCurrentPackageListJson(moduleNames)
 	if err != nil {
 		return nil, err
