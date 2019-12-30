@@ -61,6 +61,8 @@ func (c *copier) PkgModPath(importPath, version string) string {
 
 	var normPath string
 
+	// go mod replaces capital letters with "!" and then the lower case.
+	// This checks for that and switches it so we can find the file
 	for _, char := range importPath {
 		if unicode.IsUpper(char) {
 			normPath += "!" + string(unicode.ToLower(char))
