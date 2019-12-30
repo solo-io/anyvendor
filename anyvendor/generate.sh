@@ -10,7 +10,7 @@ set -o pipefail
 
 IN=$(dirname "${BASH_SOURCE[0]}")
 ROOT=$(go env GOMOD | rev | cut -c8- | rev)
-VALIDATE=${ROOT}/.proto/github.com/envoyprocy/protoc-gen-validate
+VALIDATE=${ROOT}/vendor_any/github.com/envoyproxy/protoc-gen-validate
 
 # code-generator does work with go.mod but makes assumptions about
 # the project living in $GOPATH/src. To work around this and support
