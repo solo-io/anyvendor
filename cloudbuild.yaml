@@ -22,7 +22,7 @@ steps:
   id: 'prepare-workspace'
 
 # download massive container in parallel
-- name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.1'
+- name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.2'
   entrypoint: 'bash'
   dir: *dir
   args: ['-c', 'ls']
@@ -50,7 +50,7 @@ steps:
 # e2e-ginkgo is produced from https://github.com/solo-io/cloud-builders/e2e-ginkgo
 # sets up redis, consul, kubectl, go with required environment variables
 # need to use the provided entrypoint
-- name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.1'
+- name: 'gcr.io/$PROJECT_ID/go-mod-ginkgo:0.2.2'
   args: ['-r', '-v', '-race', '-p', '-compilers=2']
   dir: *dir
   id: 'test'
