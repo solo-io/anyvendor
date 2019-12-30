@@ -64,19 +64,13 @@ func GetCurrentModPackageFile() (string, error) {
 }
 
 func GetCurrentPackageListAll() (*bytes.Buffer, error) {
-	return GoModListWrapper(nil, "")
+	return goModListWrapper(nil, "")
 }
 
-func GetCurrentPackageListJson() ([]*Module, error) {
-	byt, err := GoModListWrapper([]string{"-f", "{{.Path}}"}, "")
-	if err != nil {
-		return nil, err
-	}
+func GetCurrentPackageListJson(modules []string) ([]*Module, error) {
 	var packages []*Module
-	scanner := bufio.NewScanner(byt)
-	for scanner.Scan() {
-		line := scanner.Text()
-		jsonByt, err := GoModListWrapper([]string{"-json"}, line)
+	for _, v := range modules {
+		jsonByt, err := goModListWrapper([]string{"-json"}, v)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +83,7 @@ func GetCurrentPackageListJson() ([]*Module, error) {
 	return packages, nil
 }
 
-func GoModListWrapper(args []string, packageName string) (*bytes.Buffer, error) {
+func goModListWrapper(args []string, packageName string) (*bytes.Buffer, error) {
 	args = append([]string{"list", "-m"}, args...)
 	if packageName != "" {
 		args = append(args, packageName)

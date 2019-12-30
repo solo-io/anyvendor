@@ -24,7 +24,11 @@ var _ = Describe("modutils", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 	It("can list the packages used by this module (json)", func() {
-		list, err := GetCurrentPackageListJson()
+		modules := []string{
+			"github.com/solo-io/anyvendor",
+			"github.com/envoyproxy/protoc-gen-validate",
+		}
+		list, err := GetCurrentPackageListJson(modules)
 		Expect(list[0].Path).To(Equal("github.com/solo-io/anyvendor"))
 		Expect(err).NotTo(HaveOccurred())
 	})

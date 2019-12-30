@@ -10,4 +10,6 @@ const (
 	// See this section for more info: https://tip.golang.org/doc/go1.14#go-command
 	// This tool should not force to projects to build using vendor.
 	DefaultDepDir = "vendor_any"
+
+	ProtoMatchPattern = "**/*.proto"
 )

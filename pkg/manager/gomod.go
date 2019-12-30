@@ -13,13 +13,9 @@ import (
 	"github.com/spf13/afero"
 )
 
-const (
-	ProtoMatchPattern = "**/*.proto"
-)
-
 var (
 	// offer sane defaults for proto vendoring
-	DefaultMatchPatterns = []string{ProtoMatchPattern}
+	DefaultMatchPatterns = []string{anyvendor.ProtoMatchPattern}
 )
 
 type goModOptions struct {
@@ -82,11 +78,6 @@ func (m *goModFactory) Ensure(ctx context.Context, opts *anyvendor.Config) error
 // currently this function uses the cmd `go list -m all` to figure out the list of dep
 // all of the logic surrounding go.mod and the go cli calls are in the modutils package
 func (m *goModFactory) gather(opts goModOptions) ([]*moduleWithImports, error) {
-	modPackages, err := modutils.GetCurrentPackageListJson()
-	if err != nil {
-		return nil, err
-	}
-
 	// Ensure go.mod file exists and we're running from the project root,
 	modPackageFile, err := modutils.GetCurrentModPackageFile()
 	if err != nil {
@@ -94,6 +85,16 @@ func (m *goModFactory) gather(opts goModOptions) ([]*moduleWithImports, error) {
 	}
 
 	packageName, err := modutils.GetCurrentModPackageName(modPackageFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var moduleNames []string
+	for _, v := range opts.MatchOptions {
+		moduleNames = append(moduleNames, v.Package)
+	}
+	moduleNames = append(moduleNames, packageName)
+	modPackages, err := modutils.GetCurrentPackageListJson(moduleNames)
 	if err != nil {
 		return nil, err
 	}
