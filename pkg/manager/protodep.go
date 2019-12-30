@@ -6,12 +6,20 @@ import (
 	"github.com/solo-io/protodep/protodep"
 )
 
-type DepFactory interface {
+/*
+	An internal only interface used to represent the different types of available sources
+	for non-go vendored files.
+*/
+type depFactory interface {
 	Ensure(ctx context.Context, opts *protodep.Config) error
 }
 
+/*
+	The manager is the external facing object that will be responsible for ensuring
+	a given protodep config, as outlined by the `protodep.Config` object.
+*/
 type Manager struct {
-	depFactories []DepFactory
+	depFactories []depFactory
 }
 
 func NewManager(ctx context.Context, cwd string) (*Manager, error) {
@@ -23,7 +31,7 @@ func NewManager(ctx context.Context, cwd string) (*Manager, error) {
 		return nil, err
 	}
 	return &Manager{
-		depFactories: []DepFactory{
+		depFactories: []depFactory{
 			goMod,
 		},
 	}, nil
