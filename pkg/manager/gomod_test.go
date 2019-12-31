@@ -61,7 +61,7 @@ var _ = Describe("anyvendor", func() {
 					fs:         mockFs,
 				}
 			})
-			Context("basic import", func() {
+			Context("errors", func() {
 				It("will error if dir does not exist", func() {
 					mockFs.EXPECT().Stat(fakeDir).Return(nil, os.ErrNotExist)
 					_, err := mgr.handleSingleModule(standardModule, nil)
@@ -75,15 +75,6 @@ var _ = Describe("anyvendor", func() {
 					Expect(err).To(HaveOccurred())
 					Expect(eris.Cause(err)).To(Equal(fakeErr))
 				})
-				It("nil match opts", func() {
-					vendorList := []string{"vendorLIst"}
-					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
-					mockCp.EXPECT().GetMatches(DefaultMatchPatterns, fakeDir).Return(vendorList, nil)
-					mod, err := mgr.handleSingleModule(standardModule, nil)
-					Expect(err).NotTo(HaveOccurred())
-					Expect(mod.vendorList).To(Equal(vendorList))
-					Expect(mod.module.Dir).To(Equal(fakeDir))
-				})
 				It("real match opts, will error if get matches fails", func() {
 					matchOptions := []*anyvendor.GoModImport{
 						EnvoyValidateProtoMatcher,
@@ -93,6 +84,17 @@ var _ = Describe("anyvendor", func() {
 					_, err := mgr.handleSingleModule(standardModule, matchOptions)
 					Expect(err).To(HaveOccurred())
 					Expect(eris.Cause(err)).To(Equal(fakeErr))
+				})
+			})
+			Context("basic imports", func() {
+				It("nil match opts", func() {
+					vendorList := []string{"vendorLIst"}
+					mockFs.EXPECT().Stat(fakeDir).Return(nil, nil)
+					mockCp.EXPECT().GetMatches(DefaultMatchPatterns, fakeDir).Return(vendorList, nil)
+					mod, err := mgr.handleSingleModule(standardModule, nil)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(mod.vendorList).To(Equal(vendorList))
+					Expect(mod.module.Dir).To(Equal(fakeDir))
 				})
 				It("real match opts", func() {
 					matchOptions := []*anyvendor.GoModImport{
@@ -106,13 +108,6 @@ var _ = Describe("anyvendor", func() {
 					Expect(mod.vendorList).To(Equal(vendorList))
 					Expect(mod.module.Dir).To(Equal(fakeDir))
 				})
-			})
-			Context("replaced import", func() {
-
-			})
-
-			Context("local import", func() {
-
 			})
 		})
 

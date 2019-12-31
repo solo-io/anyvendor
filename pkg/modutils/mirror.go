@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// mirror of https://golang.org/src/cmd/go/internal/list/list.go
+// used to unmarshal output of `go list -m json`
 type Module struct {
 	Path      string       // module path
 	Version   string       // module version
