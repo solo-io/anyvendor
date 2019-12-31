@@ -1,7 +1,7 @@
 package ensure
 
 import (
-	"github.com/solo-io/protodep/pkg/cli/internal/options"
+	"github.com/solo-io/anyvendor/pkg/cli/internal/options"
 	"github.com/spf13/cobra"
 )
 

@@ -3,9 +3,9 @@ package cli
 import (
 	"context"
 
-	"github.com/solo-io/protodep/pkg/cli/internal/cmd/ensure"
-	"github.com/solo-io/protodep/pkg/cli/internal/flags"
-	"github.com/solo-io/protodep/pkg/cli/internal/options"
+	"github.com/solo-io/anyvendor/pkg/cli/internal/cmd/ensure"
+	"github.com/solo-io/anyvendor/pkg/cli/internal/flags"
+	"github.com/solo-io/anyvendor/pkg/cli/internal/options"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ func RootCmd() *cobra.Command {
 		Ctx: context.Background(),
 	}
 	cmd := &cobra.Command{
-		Use:   "protodep",
+		Use:   "anyvendor",
 		Short: "",
 		Long:  "",
 	}

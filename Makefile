@@ -53,9 +53,9 @@ $(OUTPUT_DIR)/.generated-code:
 #----------------------------------------------------------------------------------
 
 .PHONY: cli
-cli: $(OUTPUT_DIR)/protodep
+cli: $(OUTPUT_DIR)/anyvendor
 
-$(OUTPUT_DIR)/protodep:
+$(OUTPUT_DIR)/anyvendor:
 	go build -o $@ main.go
 
 .PHONY: install
