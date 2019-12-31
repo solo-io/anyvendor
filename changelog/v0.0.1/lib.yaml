@@ -1,0 +1,4 @@
+changelog:
+- type: NEW_FEATURE
+  description: Expose anyvendor as a library.
+  issueLink: https://github.com/solo-io/anyvendor/issues/3

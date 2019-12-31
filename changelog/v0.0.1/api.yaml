@@ -1,4 +1,4 @@
 changelog:
 - type: NEW_FEATURE
-  description: Create API for protodep.
-  issueLink: https://github.com/solo-io/protodep/issues/1
+  description: Create API for anyvendor.
+  issueLink: https://github.com/solo-io/anyvendor/issues/1
