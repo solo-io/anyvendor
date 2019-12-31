@@ -8,11 +8,6 @@ if [ ! -f .gitignore ]; then
   echo "_output" > .gitignore
 fi
 
-
-#git config user.email "you@example.com"
-#git config user.name "Your Name"
-
-
 PATH=/workspace/gopath/bin:$PATH
 
 set +e
