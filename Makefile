@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------------
 
 ROOTDIR := $(shell pwd)
-PACKAGE_PATH:=github.com/solo-io/protodep
+PACKAGE_PATH:=github.com/solo-io/anyvendor
 OUTPUT_DIR ?= $(ROOTDIR)/_output
 SOURCES := $(shell find . -name "*.go" | grep -v test.go)
 VERSION ?= $(shell git describe --tags)
@@ -25,6 +25,7 @@ init:
 update-deps: mod-download install
 	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get -u github.com/golang/protobuf/protoc-gen-go
+	GO111MODULE=off go get -u github.com/envoyproxy/protoc-gen-validate
 	GO111MODULE=off go install github.com/envoyproxy/protoc-gen-validate
 	GO111MODULE=off go get -u github.com/golang/mock/gomock
 	GO111MODULE=off go install github.com/golang/mock/mockgen
@@ -41,11 +42,10 @@ mod-download:
 .PHONY: generated-code
 generated-code: $(OUTPUT_DIR)/.generated-code
 
-SUBDIRS:=pkg test
+SUBDIRS:=pkg anyvendor
 $(OUTPUT_DIR)/.generated-code:
 	mkdir -p ${OUTPUT_DIR}
 	$(GO_BUILD_FLAGS) go generate ./...
-	gofmt -w $(SUBDIRS)
 	goimports -w $(SUBDIRS)
 	touch $@
 #----------------------------------------------------------------------------------

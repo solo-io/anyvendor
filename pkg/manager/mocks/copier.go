@@ -5,8 +5,9 @@
 package mock_manager
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockFileCopier is a mock of FileCopier interface
@@ -45,4 +46,19 @@ func (m *MockFileCopier) Copy(src, dst string) (int64, error) {
 func (mr *MockFileCopierMockRecorder) Copy(src, dst interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Copy", reflect.TypeOf((*MockFileCopier)(nil).Copy), src, dst)
+}
+
+// GetMatches mocks base method
+func (m *MockFileCopier) GetMatches(copyPat []string, dir string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMatches", copyPat, dir)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMatches indicates an expected call of GetMatches
+func (mr *MockFileCopierMockRecorder) GetMatches(copyPat, dir interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMatches", reflect.TypeOf((*MockFileCopier)(nil).GetMatches), copyPat, dir)
 }

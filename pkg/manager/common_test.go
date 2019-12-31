@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -8,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rotisserie/eris"
-	mock_manager "github.com/solo-io/protodep/pkg/manager/mocks"
+	mock_manager "github.com/solo-io/anyvendor/pkg/manager/mocks"
 	"github.com/spf13/afero"
 )
 
@@ -17,14 +18,43 @@ import (
 //go:generate mockgen -package mock_manager -destination ./mocks/copier.go -source ./common.go
 
 var _ = Describe("common", func() {
+	var (
+		ctrl *gomock.Controller
+		cp   *copier
+	)
+	BeforeEach(func() {
+		ctrl = gomock.NewController(GinkgoT())
+	})
+	AfterEach(func() {
+		ctrl.Finish()
+	})
+	Context("pkgModPath", func() {
+		BeforeEach(func() {
+			cp = &copier{}
+		})
+		It("can translate a pkgModPath with a !", func() {
+			importPath := "github.com/Microsoft/package"
+			version := "this_is_a_hash"
+			result := cp.PkgModPath(importPath, version)
+			resultTest := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod",
+				fmt.Sprintf("%s@%s", "github.com/!microsoft/package", version))
+			Expect(result).To(Equal(resultTest))
+		})
+		It("can translate a standard pkgModPath", func() {
+			importPath := "github.com/microsoft/package"
+			version := "this_is_a_hash"
+			result := cp.PkgModPath(importPath, version)
+			resultTest := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod",
+				fmt.Sprintf("%s@%s", importPath, version))
+			Expect(result).To(Equal(resultTest))
+		})
+	})
 	Context("copier", func() {
 		Context("mocks", func() {
 			var (
-				ctrl         *gomock.Controller
 				mockFs       *mock_manager.MockFs
 				mockFileInfo *mock_manager.MockFileInfo
 				mockFile     *mock_manager.MockFile
-				cp           *copier
 			)
 			BeforeEach(func() {
 				ctrl = gomock.NewController(GinkgoT())

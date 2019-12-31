@@ -17,10 +17,19 @@ var _ = Describe("modutils", func() {
 		Expect(err).NotTo(HaveOccurred())
 		pacakgeName, err := GetCurrentModPackageName(name)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(pacakgeName).To(Equal("github.com/solo-io/protodep"))
+		Expect(pacakgeName).To(Equal("github.com/solo-io/anyvendor"))
 	})
 	It("can list the packages used by this module", func() {
-		_, err := GetCurrentPackageList()
+		_, err := GetCurrentPackageListAll()
+		Expect(err).NotTo(HaveOccurred())
+	})
+	It("can list the packages used by this module (json)", func() {
+		modules := []string{
+			"github.com/solo-io/anyvendor",
+			"github.com/envoyproxy/protoc-gen-validate",
+		}
+		list, err := GetCurrentPackageListJson(modules)
+		Expect(list[0].Path).To(Equal("github.com/solo-io/anyvendor"))
 		Expect(err).NotTo(HaveOccurred())
 	})
 })

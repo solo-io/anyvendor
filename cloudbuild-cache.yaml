@@ -1,7 +1,7 @@
 steps:
 - name: gcr.io/cloud-builders/gsutil
   entrypoint: 'bash'
-  args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/protodep/protodep-mod.tar.gz | tar -xzf -']
+  args: ['-c', 'mkdir -p /go/pkg && cd /go/pkg && gsutil cat gs://$PROJECT_ID-cache/anyvendor/anyvendor-mod.tar.gz | tar -xzf -']
   env:
   volumes: &vol
   - name: 'gopath'
@@ -21,11 +21,11 @@ steps:
 - name: 'golang:1.13'
   entrypoint: 'bash'
   volumes: *vol
-  args: ['-c', ' cd /go/pkg && tar -zvcf protodep-mod.tar.gz mod']
+  args: ['-c', ' cd /go/pkg && tar -zvcf anyvendor-mod.tar.gz mod']
   id: 'tar-cache'
 
 - name: gcr.io/cloud-builders/gsutil
-  args: ['cp', '/go/pkg/protodep-mod.tar.gz', 'gs://$PROJECT_ID-cache/protodep/protodep-mod.tar.gz']
+  args: ['cp', '/go/pkg/anyvendor-mod.tar.gz', 'gs://$PROJECT_ID-cache/anyvendor/anyvendor-mod.tar.gz']
   volumes: *vol
   id: 'upload-cache'
 

@@ -1,4 +1,4 @@
-package protodep
+package anyvendor
 
 // need to reenable this once the functionality to vendor the protos is enabled
 //-go:generate bash generate.sh
@@ -9,5 +9,7 @@ const (
 	// meant it would be easier for this to inhabit it's own folder
 	// See this section for more info: https://tip.golang.org/doc/go1.14#go-command
 	// This tool should not force to projects to build using vendor.
-	DefaultDepDir = ".proto_vendor"
+	DefaultDepDir = "vendor_any"
+
+	ProtoMatchPattern = "**/*.proto"
 )

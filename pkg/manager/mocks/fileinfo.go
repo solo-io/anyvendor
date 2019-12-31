@@ -5,10 +5,11 @@
 package mock_manager
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	os "os"
 	reflect "reflect"
 	time "time"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockFileInfo is a mock of FileInfo interface

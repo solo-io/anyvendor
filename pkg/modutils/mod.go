@@ -3,6 +3,7 @@ package modutils
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"strings"
@@ -62,9 +63,35 @@ func GetCurrentModPackageFile() (string, error) {
 	return trimmedModFile, nil
 }
 
-func GetCurrentPackageList() (*bytes.Buffer, error) {
+func GetCurrentPackageListAll() (*bytes.Buffer, error) {
+	return goModListWrapper(nil, "")
+}
+
+func GetCurrentPackageListJson(modules []string) ([]*Module, error) {
+	var packages []*Module
+	for _, v := range modules {
+		jsonByt, err := goModListWrapper([]string{"-json"}, v)
+		if err != nil {
+			return nil, err
+		}
+		var jsonModule Module
+		if err := json.Unmarshal(jsonByt.Bytes(), &jsonModule); err != nil {
+			return nil, err
+		}
+		packages = append(packages, &jsonModule)
+	}
+	return packages, nil
+}
+
+func goModListWrapper(args []string, packageName string) (*bytes.Buffer, error) {
+	args = append([]string{"list", "-m"}, args...)
+	if packageName != "" {
+		args = append(args, packageName)
+	} else {
+		args = append(args, "all")
+	}
+	packageListCmd := exec.Command("go", args...)
 	modPackageReader := &bytes.Buffer{}
-	packageListCmd := exec.Command("go", "list", "-m", "all")
 	packageListCmd.Stdout = modPackageReader
 	packageListCmd.Stderr = modPackageReader
 	err := packageListCmd.Run()

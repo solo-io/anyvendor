@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestProtodep(t *testing.T) {
+func TestAnyVendor(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Protodep Suite")
+	RunSpecs(t, "anyvendor Suite")
 }
