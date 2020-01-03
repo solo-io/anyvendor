@@ -91,7 +91,7 @@ func (c *copier) PkgModPath(importPath, version string) string {
 }
 
 func NewCopier(fs afero.Fs, skipDirs []string) *copier {
-	skipDirs = append(skipDirs, anyvendor.DefaultDepDir)
+	skipDirs = append(skipDirs, fmt.Sprintf("**/%s/**", anyvendor.DefaultDepDir))
 	return &copier{
 		fs:       fs,
 		skipDirs: skipDirs,
