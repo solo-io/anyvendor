@@ -1,0 +1,4 @@
+changelog:
+- type: NEW_FEATURE
+  description: Allow users to include custom skipped directories for importing.
+  issueLink: https://github.com/solo-io/anyvendor/issues/6

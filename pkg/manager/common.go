@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"unicode"
 
 	"github.com/mattn/go-zglob"
@@ -27,7 +26,8 @@ type FileCopier interface {
 var matchListFilter = fmt.Sprintf("%s/", anyvendor.DefaultDepDir)
 
 type copier struct {
-	fs afero.Fs
+	fs       afero.Fs
+	skipDirs []string
 }
 
 func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
@@ -41,8 +41,11 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 		// Filter out all matches which contain a vendor folder, those are leftovers from a previous run.
 		// Might be worth clearing the vendor folder before every run.
 		for _, match := range matches {
-			vendorFolders := strings.Count(match, matchListFilter)
-			if vendorFolders > 0 {
+			contains, err := c.containsSkippedDirectory(match)
+			if err != nil {
+				return nil, err
+			}
+			if contains {
 				continue
 			}
 			vendorList = append(vendorList, match)
@@ -50,6 +53,19 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 	}
 
 	return vendorList, nil
+}
+
+func (c *copier) containsSkippedDirectory(match string) (bool, error) {
+	for _, skipDir := range c.skipDirs {
+		matched, err := zglob.Match(skipDir, match)
+		if err != nil {
+			return false, err
+		}
+		if matched {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (c *copier) PkgModPath(importPath, version string) string {
@@ -74,9 +90,11 @@ func (c *copier) PkgModPath(importPath, version string) string {
 	return filepath.Join(goPath, "pkg", "mod", fmt.Sprintf("%s@%s", normPath, version))
 }
 
-func NewCopier(fs afero.Fs) *copier {
+func NewCopier(fs afero.Fs, skipDirs []string) *copier {
+	skipDirs = append(skipDirs, fmt.Sprintf("**/%s/**", anyvendor.DefaultDepDir))
 	return &copier{
-		fs: fs,
+		fs:       fs,
+		skipDirs: skipDirs,
 	}
 }
 
@@ -87,7 +105,10 @@ var (
 )
 
 func NewDefaultCopier() *copier {
-	return &copier{fs: afero.NewOsFs()}
+	return &copier{
+		fs:       afero.NewOsFs(),
+		skipDirs: []string{anyvendor.DefaultDepDir},
+	}
 }
 
 func (c *copier) Copy(src, dst string) (int64, error) {

@@ -11,9 +11,28 @@ import "validate/validate.proto";
     Imports is a list of import types which will be run, and then vendored.
 */
 message Config {
+    // files to be vendored from current repo
     Local local = 1;
 
+    // list of external imports to be vendored in
     repeated Import imports = 2;
+
+    FactorySettings settings = 3;
+}
+
+// a message for settings which is passed to the factories at startup
+message FactorySettings {
+    /*
+        directories which will be skipped when searching for files to vendor. Default
+        vendor_any folder is skipped by default.
+    */
+
+    // Example: [**/node_modules/**]
+    // Any paths which start the string `node_modules` will be skipped over by the copier.
+    repeated string skip_patterns = 1;
+
+    // Current working directory
+    string cwd = 2;
 }
 
 message Import {
