@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"unicode"
 
 	"github.com/mattn/go-zglob"
@@ -42,7 +41,11 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 		// Filter out all matches which contain a vendor folder, those are leftovers from a previous run.
 		// Might be worth clearing the vendor folder before every run.
 		for _, match := range matches {
-			if c.containsSkippedDirectory(match) {
+			contains, err := c.containsSkippedDirectory(match)
+			if err != nil {
+				return nil, err
+			}
+			if contains {
 				continue
 			}
 			vendorList = append(vendorList, match)
@@ -52,16 +55,17 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 	return vendorList, nil
 }
 
-func (c *copier) containsSkippedDirectory(match string) bool {
-	splitPath := strings.Split(match, string(os.PathSeparator))
+func (c *copier) containsSkippedDirectory(match string) (bool, error) {
 	for _, skipDir := range c.skipDirs {
-		for _, v := range splitPath {
-			if v == skipDir {
-				return true
-			}
+		matched, err := zglob.Match(skipDir, match)
+		if err != nil {
+			return false, err
+		}
+		if matched {
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 func (c *copier) PkgModPath(importPath, version string) string {

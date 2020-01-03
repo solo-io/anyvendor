@@ -53,19 +53,19 @@ var _ = Describe("common", func() {
 	Context("skip dirs", func() {
 		It("can skip explicit dirs properly", func() {
 			cp = &copier{
-				skipDirs: []string{"node_modules"},
+				skipDirs: []string{"**/node_modules/**"},
 			}
-			Expect(cp.containsSkippedDirectory("path/node_modules/hello")).To(BeTrue())
+			Expect(cp.containsSkippedDirectory("path/node_modules/hello.txt")).To(BeTrue())
 		})
 		It("will not skip non skipped dirs", func() {
 			cp = &copier{
-				skipDirs: []string{"node_modules"},
+				skipDirs: []string{"**/node_modules/**"},
 			}
-			Expect(cp.containsSkippedDirectory("path/to/hello")).To(BeFalse())
+			Expect(cp.containsSkippedDirectory("path/to/hello.txt")).To(BeFalse())
 		})
 		It("can skip dirs properly with mutliple", func() {
 			cp = &copier{
-				skipDirs: []string{"node_modules", anyvendor.DefaultDepDir},
+				skipDirs: []string{"**/node_modules/**", fmt.Sprintf("**/%s/**", anyvendor.DefaultDepDir)},
 			}
 			Expect(cp.containsSkippedDirectory(filepath.Join("path", anyvendor.DefaultDepDir, "hello"))).To(BeTrue())
 		})

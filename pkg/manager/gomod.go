@@ -30,7 +30,7 @@ type moduleWithImports struct {
 }
 
 func NewGoModFactory(settings *anyvendor.FactorySettings) (*goModFactory, error) {
-	cwd := settings.Cwd
+	cwd := settings.GetCwd()
 	if !filepath.IsAbs(cwd) {
 		absoluteDir, err := filepath.Abs(cwd)
 		if err != nil {
@@ -42,7 +42,7 @@ func NewGoModFactory(settings *anyvendor.FactorySettings) (*goModFactory, error)
 	return &goModFactory{
 		WorkingDirectory: cwd,
 		fs:               fs,
-		fileCopier:       NewCopier(fs, settings.SkipDirs),
+		fileCopier:       NewCopier(fs, settings.GetSkipPatterns()),
 	}, nil
 }
 

@@ -25,12 +25,11 @@ message FactorySettings {
     /*
         directories which will be skipped when searching for files to vendor. Default
         vendor_any folder is skipped by default.
-
-        Example: [node_modules]
-
-        Any paths which include the string `node_modules` will be skipped over by the copier.
     */
-    repeated string skip_dirs = 1;
+
+    // Example: [**/node_modules/**]
+    // Any paths which start the string `node_modules` will be skipped over by the copier.
+    repeated string skip_patterns = 1;
 
     // Current working directory
     string cwd = 2;
