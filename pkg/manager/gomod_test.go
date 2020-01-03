@@ -222,7 +222,9 @@ var _ = Describe("anyvendor", func() {
 			modFileString := strings.TrimSpace(modBytes)
 			Expect(err).NotTo(HaveOccurred())
 			modPathString = filepath.Dir(modFileString)
-			mgr, err = NewGoModFactory(modPathString)
+			mgr, err = NewGoModFactory(&anyvendor.FactorySettings{
+				Cwd: modPathString,
+			})
 			Expect(err).NotTo(HaveOccurred())
 		})
 		It("can vendor protos", func() {

@@ -27,7 +27,8 @@ type FileCopier interface {
 var matchListFilter = fmt.Sprintf("%s/", anyvendor.DefaultDepDir)
 
 type copier struct {
-	fs afero.Fs
+	fs       afero.Fs
+	skipDirs []string
 }
 
 func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
@@ -41,15 +42,23 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 		// Filter out all matches which contain a vendor folder, those are leftovers from a previous run.
 		// Might be worth clearing the vendor folder before every run.
 		for _, match := range matches {
-			vendorFolders := strings.Count(match, matchListFilter)
-			if vendorFolders > 0 {
-				continue
+			if c.containsSkippedDirectory(match) {
+
 			}
 			vendorList = append(vendorList, match)
 		}
 	}
 
 	return vendorList, nil
+}
+
+func (c *copier) containsSkippedDirectory(match string) bool {
+	for _, skipDir := range c.skipDirs {
+		if idx := strings.Index(match, skipDir); idx != -1 {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *copier) PkgModPath(importPath, version string) string {
@@ -74,9 +83,11 @@ func (c *copier) PkgModPath(importPath, version string) string {
 	return filepath.Join(goPath, "pkg", "mod", fmt.Sprintf("%s@%s", normPath, version))
 }
 
-func NewCopier(fs afero.Fs) *copier {
+func NewCopier(fs afero.Fs, skipDirs []string) *copier {
+	skipDirs = append(skipDirs, anyvendor.DefaultDepDir)
 	return &copier{
-		fs: fs,
+		fs:       fs,
+		skipDirs: skipDirs,
 	}
 }
 
@@ -87,7 +98,10 @@ var (
 )
 
 func NewDefaultCopier() *copier {
-	return &copier{fs: afero.NewOsFs()}
+	return &copier{
+		fs:       afero.NewOsFs(),
+		skipDirs: []string{anyvendor.DefaultDepDir},
+	}
 }
 
 func (c *copier) Copy(src, dst string) (int64, error) {

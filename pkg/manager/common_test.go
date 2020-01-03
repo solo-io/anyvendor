@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/rotisserie/eris"
+	"github.com/solo-io/anyvendor/anyvendor"
 	mock_manager "github.com/solo-io/anyvendor/pkg/manager/mocks"
 	"github.com/spf13/afero"
 )
@@ -49,6 +50,26 @@ var _ = Describe("common", func() {
 			Expect(result).To(Equal(resultTest))
 		})
 	})
+	Context("skip dirs", func() {
+		It("can skip explicit dirs properly", func() {
+			cp = &copier{
+				skipDirs: []string{"node_modules"},
+			}
+			Expect(cp.containsSkippedDirectory("path/node_modules/hello")).To(BeTrue())
+		})
+		It("will not skip non skipped dirs", func() {
+			cp = &copier{
+				skipDirs: []string{"node_modules"},
+			}
+			Expect(cp.containsSkippedDirectory("path/to/hello")).To(BeFalse())
+		})
+		It("can skip dirs properly with mutliple", func() {
+			cp = &copier{
+				skipDirs: []string{"node_modules", anyvendor.DefaultDepDir},
+			}
+			Expect(cp.containsSkippedDirectory(filepath.Join("path", anyvendor.DefaultDepDir, "hello"))).To(BeTrue())
+		})
+	})
 	Context("copier", func() {
 		Context("mocks", func() {
 			var (
@@ -61,7 +82,7 @@ var _ = Describe("common", func() {
 				mockFs = mock_manager.NewMockFs(ctrl)
 				mockFileInfo = mock_manager.NewMockFileInfo(ctrl)
 				mockFile = mock_manager.NewMockFile(ctrl)
-				cp = NewCopier(mockFs)
+				cp = NewCopier(mockFs, nil)
 			})
 			It("will return error if mkdir fails", func() {
 				src, dst := "src/src.go", "dst/dstgo."
