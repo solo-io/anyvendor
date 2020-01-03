@@ -43,7 +43,7 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 		// Might be worth clearing the vendor folder before every run.
 		for _, match := range matches {
 			if c.containsSkippedDirectory(match) {
-
+				continue
 			}
 			vendorList = append(vendorList, match)
 		}
