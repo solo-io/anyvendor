@@ -53,9 +53,12 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 }
 
 func (c *copier) containsSkippedDirectory(match string) bool {
+	splitPath := strings.Split(match, string(os.PathSeparator))
 	for _, skipDir := range c.skipDirs {
-		if idx := strings.Index(match, skipDir); idx != -1 {
-			return true
+		for _, v := range splitPath {
+			if v == skipDir {
+				return true
+			}
 		}
 	}
 	return false
