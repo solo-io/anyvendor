@@ -12,6 +12,8 @@ github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334/go.mod h1:SK73t
 github.com/lyft/protoc-gen-star v0.4.14/go.mod h1:mE8fbna26u7aEA2QCVvvfBU/ZrPgocG1206xAFPcs94=
 github.com/mattn/go-zglob v0.0.1 h1:xsEx/XUoVlI6yXjqBK062zYhRTZltCNmYPx6v+8DNaY=
 github.com/mattn/go-zglob v0.0.1/go.mod h1:9fxibJccNxU2cnpIKLRRFA7zX7qhkJIQWBb449FYHOo=
+github.com/mattn/go-zglob v0.0.3 h1:6Ry4EYsScDyt5di4OI6xw1bYhOqfE5S33Z1OPy+d+To=
+github.com/mattn/go-zglob v0.0.3/go.mod h1:9fxibJccNxU2cnpIKLRRFA7zX7qhkJIQWBb449FYHOo=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.11.0 h1:JAKSXpt1YjtLA7YpPiqO9ss6sNXEsPfSGdwN0UHqzrw=
 github.com/onsi/ginkgo v1.11.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
