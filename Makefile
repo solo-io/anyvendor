@@ -49,4 +49,5 @@ $(OUTPUT_DIR)/.generated-code:
 	PATH=$(DEPSGOBIN):$$PATH mkdir -p ${OUTPUT_DIR}
 	PATH=$(DEPSGOBIN):$$PATH $(GO_BUILD_FLAGS) go generate ./...
 	PATH=$(DEPSGOBIN):$$PATH goimports -w $(SUBDIRS)
+	PATH=$(DEPSGOBIN):$$PATH go mod tidy
 	PATH=$(DEPSGOBIN):$$PATH touch $@
