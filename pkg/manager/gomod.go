@@ -159,7 +159,7 @@ func (m *goModFactory) handleSingleModule(module *modutils.Module, matchOptions 
 		if err != nil {
 			return nil, err
 		}
-		result = vendorList
+		result = append(result, vendorList...)
 	}
 	return &moduleWithImports{
 		module:     module,
