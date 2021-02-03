@@ -1,0 +1,4 @@
+changelog:
+- type: FIX
+  description: Do not overwrite vendorList in certain edge cases.
+  issueLink: https://github.com/solo-io/anyvendor/issues/8
