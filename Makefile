@@ -7,6 +7,7 @@ PACKAGE_PATH:=github.com/solo-io/anyvendor
 OUTPUT_DIR ?= $(ROOTDIR)/_output
 SOURCES := $(shell find . -name "*.go" | grep -v test.go)
 VERSION ?= $(shell git describe --tags)
+DEPSGOBIN=$(shell pwd)/.bin
 
 #----------------------------------------------------------------------------------
 # Repo init
@@ -23,12 +24,13 @@ init:
 
 .PHONY: update-deps
 update-deps: mod-download
-	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
-	GO111MODULE=off go get -u github.com/golang/protobuf/protoc-gen-go
-	GO111MODULE=off go get -u github.com/envoyproxy/protoc-gen-validate
-	GO111MODULE=off go install github.com/envoyproxy/protoc-gen-validate
-	GO111MODULE=off go get -u github.com/golang/mock/gomock
-	GO111MODULE=off go install github.com/golang/mock/mockgen
+	mkdir -p $(DEPSGOBIN)
+	PATH=$(DEPSGOBIN):$$PATH go get -u golang.org/x/tools/cmd/goimports
+	PATH=$(DEPSGOBIN):$$PATH go get -u github.com/golang/protobuf/protoc-gen-go
+	PATH=$(DEPSGOBIN):$$PATH go get -u github.com/envoyproxy/protoc-gen-validate
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/envoyproxy/protoc-gen-validate
+	PATH=$(DEPSGOBIN):$$PATH go get -u github.com/golang/mock/gomock
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/golang/mock/mockgen
 
 
 .PHONY: mod-download
@@ -44,7 +46,7 @@ generated-code: $(OUTPUT_DIR)/.generated-code
 
 SUBDIRS:=pkg anyvendor
 $(OUTPUT_DIR)/.generated-code:
-	mkdir -p ${OUTPUT_DIR}
-	$(GO_BUILD_FLAGS) go generate ./...
-	goimports -w $(SUBDIRS)
-	touch $@
+	PATH=$(DEPSGOBIN):$$PATH mkdir -p ${OUTPUT_DIR}
+	PATH=$(DEPSGOBIN):$$PATH $(GO_BUILD_FLAGS) go generate ./...
+	PATH=$(DEPSGOBIN):$$PATH goimports -w $(SUBDIRS)
+	PATH=$(DEPSGOBIN):$$PATH touch $@
