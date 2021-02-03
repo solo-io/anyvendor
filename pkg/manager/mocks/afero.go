@@ -50,6 +50,20 @@ func (mr *MockFsMockRecorder) Chmod(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Chmod", reflect.TypeOf((*MockFs)(nil).Chmod), arg0, arg1)
 }
 
+// Chown mocks base method
+func (m *MockFs) Chown(arg0 string, arg1, arg2 int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Chown", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Chown indicates an expected call of Chown
+func (mr *MockFsMockRecorder) Chown(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Chown", reflect.TypeOf((*MockFs)(nil).Chown), arg0, arg1, arg2)
+}
+
 // Chtimes mocks base method
 func (m *MockFs) Chtimes(arg0 string, arg1, arg2 time.Time) error {
 	m.ctrl.T.Helper()

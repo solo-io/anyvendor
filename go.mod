@@ -3,15 +3,20 @@ module github.com/solo-io/anyvendor
 go 1.13
 
 require (
-	github.com/envoyproxy/protoc-gen-validate v0.1.0
-	github.com/golang/mock v1.3.1
-	github.com/golang/protobuf v1.3.2
-	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334 // indirect
-	github.com/lyft/protoc-gen-star v0.4.14 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.4.1
+	github.com/golang/mock v1.4.4
+	github.com/golang/protobuf v1.4.3
+	github.com/iancoleman/strcase v0.1.3 // indirect
+	github.com/lyft/protoc-gen-star v0.5.2 // indirect
 	github.com/mattn/go-zglob v0.0.3
 	github.com/onsi/ginkgo v1.11.0
 	github.com/onsi/gomega v1.8.1
 	github.com/rotisserie/eris v0.1.1
-	github.com/spf13/afero v1.2.2
-	github.com/stretchr/testify v1.6.1 // indirect
+	github.com/spf13/afero v1.5.1
+	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
+	golang.org/x/mod v0.4.1 // indirect
+	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
+	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/tools v0.1.0 // indirect
 )
