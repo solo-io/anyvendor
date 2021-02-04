@@ -22,7 +22,24 @@ type Manager struct {
 	depFactories []depFactory
 }
 
-func NewManager(ctx context.Context, settings *anyvendor.FactorySettings) (*Manager, error) {
+func NewManager(ctx context.Context, cwd string) (*Manager, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goMod, err := NewGoModFactory(&anyvendor.FactorySettings{
+		Cwd: cwd,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &Manager{
+		depFactories: []depFactory{
+			goMod,
+		},
+	}, nil
+}
+
+func NewManagerWithSettings(ctx context.Context, settings *anyvendor.FactorySettings) (*Manager, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
