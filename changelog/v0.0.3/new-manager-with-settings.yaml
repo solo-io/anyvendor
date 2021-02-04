@@ -1,0 +1,4 @@
+changelog:
+  - type: NEW_FEATURE
+    description: Use manager.NewManagerWithSettings to set up an anyvendor manager with a list of directories to skip.
+    issueLink: https://github.com/solo-io/anyvendor/issues/12
