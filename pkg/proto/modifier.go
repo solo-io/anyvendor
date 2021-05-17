@@ -1,12 +1,13 @@
 package proto
 
 import (
-	"github.com/mattn/go-zglob"
-	"github.com/rotisserie/eris"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/mattn/go-zglob"
+	"github.com/rotisserie/eris"
 )
 
 // ProtoFilePatcher updates vendored proto files with custom patches.
@@ -68,7 +69,7 @@ func PatchProtoFile(path, goPackage string) error {
 	}
 	if !replaced {
 		// insert after syntax line
-		lines = append(lines[:packageDeclarationLine+1], append([]string{"\n"+goPackageLine,}, lines[packageDeclarationLine+1:]...)...)
+		lines = append(lines[:packageDeclarationLine+1], append([]string{"\n" + goPackageLine}, lines[packageDeclarationLine+1:]...)...)
 	}
 	fileInfo, err := os.Stat(path)
 	if err != nil {

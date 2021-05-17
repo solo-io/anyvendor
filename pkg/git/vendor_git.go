@@ -2,10 +2,11 @@ package git
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/rotisserie/eris"
 	"github.com/solo-io/anyvendor/pkg/manager"
 	"github.com/spf13/afero"
-	"path/filepath"
 )
 
 // vendor files from git repositories
@@ -25,10 +26,10 @@ func (r VendorOptions) Vendor(cache *GitVendorCache, vendorDir string) error {
 // vendor files from a git repository
 type GitRepository struct {
 	// The repo URL
-	URL           string
+	URL string
 	// provide one of SHA or Tag
-	SHA           string
-	Tag           string
+	SHA string
+	Tag string
 
 	// HTTP Auth User (for private repository)
 	AuthUser string
@@ -38,7 +39,7 @@ type GitRepository struct {
 	// match files with these patterns in the repo
 	MatchPatterns []string
 	// skip these dirs when vendoring files
-	SkipDirs      []string
+	SkipDirs []string
 }
 
 func (r *GitRepository) Vendor(cache *GitVendorCache, vendorDir string) error {
