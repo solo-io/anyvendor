@@ -9,6 +9,9 @@ import (
 )
 
 var _ = Describe("VendorGit", func() {
+	AfterEach(func() {
+		_ = os.RemoveAll("./test_vendor")
+	})
 	It("vendors from git", func() {
 		err := git.VendorOptions{GitRepositories: []git.GitRepository{{
 			URL:           "https://github.com/kelseyhightower/nocode",
