@@ -1,0 +1,7 @@
+changelog:
+- type: NEW_FEATURE
+  description: Support vendoring from git repos.
+  issueLink: https://github.com/solo-io/anyvendor/issues/13
+- type: NEW_FEATURE
+  description: Support patching vendored proto files.
+  issueLink: https://github.com/solo-io/anyvendor/issues/14
