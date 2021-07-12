@@ -1,0 +1,62 @@
+name: pull_request
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request: { }
+
+jobs:
+  check-code-gen:
+    name: check-code-gen
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git fetch --prune --unshallow
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16.3
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install Protoc
+        uses: solo-io/setup-protoc@master
+        with:
+          version: '3.6.1'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check code gen
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          ./ci/check-code-gen.sh
+
+  unit-tests:
+    name: unit-tests
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git fetch --prune --unshallow
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16.3
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install Protoc
+        uses: solo-io/setup-protoc@master
+        with:
+          version: '3.6.1'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Unit Tests
+        run: |
+          make update-deps run-tests
