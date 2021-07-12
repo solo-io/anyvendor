@@ -10,30 +10,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockFileCopier is a mock of FileCopier interface
+// MockFileCopier is a mock of FileCopier interface.
 type MockFileCopier struct {
 	ctrl     *gomock.Controller
 	recorder *MockFileCopierMockRecorder
 }
 
-// MockFileCopierMockRecorder is the mock recorder for MockFileCopier
+// MockFileCopierMockRecorder is the mock recorder for MockFileCopier.
 type MockFileCopierMockRecorder struct {
 	mock *MockFileCopier
 }
 
-// NewMockFileCopier creates a new mock instance
+// NewMockFileCopier creates a new mock instance.
 func NewMockFileCopier(ctrl *gomock.Controller) *MockFileCopier {
 	mock := &MockFileCopier{ctrl: ctrl}
 	mock.recorder = &MockFileCopierMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockFileCopier) EXPECT() *MockFileCopierMockRecorder {
 	return m.recorder
 }
 
-// Copy mocks base method
+// Copy mocks base method.
 func (m *MockFileCopier) Copy(src, dst string) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Copy", src, dst)
@@ -42,13 +42,13 @@ func (m *MockFileCopier) Copy(src, dst string) (int64, error) {
 	return ret0, ret1
 }
 
-// Copy indicates an expected call of Copy
+// Copy indicates an expected call of Copy.
 func (mr *MockFileCopierMockRecorder) Copy(src, dst interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Copy", reflect.TypeOf((*MockFileCopier)(nil).Copy), src, dst)
 }
 
-// GetMatches mocks base method
+// GetMatches mocks base method.
 func (m *MockFileCopier) GetMatches(copyPat []string, dir string) ([]string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMatches", copyPat, dir)
@@ -57,7 +57,7 @@ func (m *MockFileCopier) GetMatches(copyPat []string, dir string) ([]string, err
 	return ret0, ret1
 }
 
-// GetMatches indicates an expected call of GetMatches
+// GetMatches indicates an expected call of GetMatches.
 func (mr *MockFileCopierMockRecorder) GetMatches(copyPat, dir interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMatches", reflect.TypeOf((*MockFileCopier)(nil).GetMatches), copyPat, dir)
