@@ -31,6 +31,7 @@ update-deps: mod-download
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/envoyproxy/protoc-gen-validate
 	PATH=$(DEPSGOBIN):$$PATH go get -u github.com/golang/mock/gomock
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/golang/mock/mockgen
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/onsi/ginkgo/ginkgo
 
 
 .PHONY: mod-download
@@ -51,3 +52,15 @@ $(OUTPUT_DIR)/.generated-code:
 	PATH=$(DEPSGOBIN):$$PATH goimports -w $(SUBDIRS)
 	PATH=$(DEPSGOBIN):$$PATH go mod tidy
 	PATH=$(DEPSGOBIN):$$PATH touch $@
+
+# run all tests
+# set TEST_PKG to run a specific test package
+.PHONY: run-tests
+run-tests:
+	ginkgo -r -failFast -trace $(GINKGOFLAGS) \
+		-ldflags=$(LDFLAGS) \
+		-gcflags=$(GCFLAGS) \
+		-progress \
+		-race \
+		-compilers=4 \
+		-skipPackage=$(SKIP_PACKAGES) $(TEST_PKG)
