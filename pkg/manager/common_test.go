@@ -30,14 +30,22 @@ var _ = Describe("common", func() {
 		ctrl.Finish()
 	})
 	Context("pkgModPath", func() {
+		var (
+			goPath string
+		)
 		BeforeEach(func() {
 			cp = &copier{}
+			goPath = os.Getenv("GOPATH")
+			if goPath == "" {
+				// the default GOPATH for go v1.11
+				goPath = filepath.Join(os.Getenv("HOME"), "go")
+			}
 		})
 		It("can translate a pkgModPath with a !", func() {
 			importPath := "github.com/Microsoft/package"
 			version := "this_is_a_hash"
 			result := cp.PkgModPath(importPath, version)
-			resultTest := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod",
+			resultTest := filepath.Join(goPath, "pkg", "mod",
 				fmt.Sprintf("%s@%s", "github.com/!microsoft/package", version))
 			Expect(result).To(Equal(resultTest))
 		})
@@ -45,7 +53,7 @@ var _ = Describe("common", func() {
 			importPath := "github.com/microsoft/package"
 			version := "this_is_a_hash"
 			result := cp.PkgModPath(importPath, version)
-			resultTest := filepath.Join(os.Getenv("GOPATH"), "pkg", "mod",
+			resultTest := filepath.Join(goPath, "pkg", "mod",
 				fmt.Sprintf("%s@%s", importPath, version))
 			Expect(result).To(Equal(resultTest))
 		})
