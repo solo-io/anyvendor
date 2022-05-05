@@ -39,7 +39,10 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 	}
 
 	for _, fileToPatch := range filesToPatch {
-		goPackageForFile := p.PatchGoPackage(strings.TrimPrefix(fileToPatch, p.RootDir))
+		var goPackageForFile string
+		if p.PatchGoPackage != nil {
+			goPackageForFile = p.PatchGoPackage(strings.TrimPrefix(fileToPatch, p.RootDir))
+		}
 		if err := PatchProtoFile(fileToPatch, goPackageForFile, p.PatchImports); err != nil {
 			return err
 		}
@@ -49,7 +52,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 }
 
 func PatchProtoFile(path, goPackage string, patchImports func(string) string) error {
-	if goPackage == "" {
+	if goPackage == "" && patchImports == nil {
 		return nil
 	}
 	b, err := ioutil.ReadFile(path)
@@ -67,13 +70,13 @@ func PatchProtoFile(path, goPackage string, patchImports func(string) string) er
 			lines[i] = replaceImport(line, patchImports)
 		case strings.HasPrefix(line, "package"):
 			packageDeclarationLine = i
-		case strings.HasPrefix(line, "option go_package"):
+		case strings.HasPrefix(line, "option go_package") && goPackage != "":
 			// replace existing go_package
 			lines[i] = goPackageLine
 			replaced = true
 		}
 	}
-	if !replaced {
+	if !replaced && goPackage != "" {
 		// insert after syntax line
 		lines = append(lines[:packageDeclarationLine+1], append([]string{"\n" + goPackageLine}, lines[packageDeclarationLine+1:]...)...)
 	}
