@@ -1,6 +1,7 @@
 package proto
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,6 +35,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 		}
 		for _, match := range matches {
 			filesToPatch = append(filesToPatch, match)
+			fmt.Println("will patch " + match)
 		}
 	}
 
