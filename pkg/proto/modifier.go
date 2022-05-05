@@ -1,6 +1,7 @@
 package proto
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -14,6 +15,9 @@ import (
 type ProtoFilePatcher struct {
 	// specify a function that returns the go_package option the patched proto file will use
 	PatchGoPackage func(path string) string
+
+	// specify a function that can manipulate the proto imports
+	PatchImports func(protoImport string) string
 
 	// the root of the vendor dir where the proto files will be patched recursively
 	RootDir string
@@ -36,7 +40,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 
 	for _, fileToPatch := range filesToPatch {
 		goPackageForFile := p.PatchGoPackage(strings.TrimPrefix(fileToPatch, p.RootDir))
-		if err := PatchProtoFile(fileToPatch, goPackageForFile); err != nil {
+		if err := PatchProtoFile(fileToPatch, goPackageForFile, p.PatchImports); err != nil {
 			return err
 		}
 	}
@@ -44,7 +48,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 	return nil
 }
 
-func PatchProtoFile(path, goPackage string) error {
+func PatchProtoFile(path, goPackage string, patchImports func(string) string) error {
 	if goPackage == "" {
 		return nil
 	}
@@ -59,6 +63,8 @@ func PatchProtoFile(path, goPackage string) error {
 	var replaced bool
 	for i, line := range lines {
 		switch {
+		case strings.HasPrefix(line, "import"):
+			lines[i] = replaceImport(line, patchImports)
 		case strings.HasPrefix(line, "package"):
 			packageDeclarationLine = i
 		case strings.HasPrefix(line, "option go_package"):
@@ -77,4 +83,18 @@ func PatchProtoFile(path, goPackage string) error {
 	}
 
 	return ioutil.WriteFile(path, []byte(strings.Join(lines, "\n")), fileInfo.Mode())
+}
+
+func replaceImport(line string, importFunc func(string) string) string {
+	if importFunc == nil {
+		return line
+	}
+
+	parts := strings.Split(line, `"`)
+	if len(parts) != 3 {
+		// Won't happen unless there's a syntax error
+		return line
+	}
+
+	return fmt.Sprintf(`import "%s";`, importFunc(parts[1]))
 }
