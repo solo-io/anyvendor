@@ -19,6 +19,9 @@ type ProtoFilePatcher struct {
 	// specify a function that can manipulate the proto imports
 	PatchImports func(protoImport string) string
 
+	// specify a function that can manipulate the proto package
+	PatchPackage func(pkg string) string
+
 	// the root of the vendor dir where the proto files will be patched recursively
 	RootDir string
 	// patch files matching these patterns
@@ -43,7 +46,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 		if p.PatchGoPackage != nil {
 			goPackageForFile = p.PatchGoPackage(strings.TrimPrefix(fileToPatch, p.RootDir))
 		}
-		if err := PatchProtoFile(fileToPatch, goPackageForFile, p.PatchImports); err != nil {
+		if err := PatchProtoFile(fileToPatch, goPackageForFile, p.PatchImports, p.PatchPackage); err != nil {
 			return err
 		}
 	}
@@ -51,10 +54,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 	return nil
 }
 
-func PatchProtoFile(path, goPackage string, patchImports func(string) string) error {
-	if goPackage == "" && patchImports == nil {
-		return nil
-	}
+func PatchProtoFile(path, goPackage string, patchImports func(string) string, patchPackage func(string) string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -70,6 +70,7 @@ func PatchProtoFile(path, goPackage string, patchImports func(string) string) er
 			lines[i] = replaceImport(line, patchImports)
 		case strings.HasPrefix(line, "package"):
 			packageDeclarationLine = i
+			lines[i] = replacePackage(line, patchPackage)
 		case strings.HasPrefix(line, "option go_package") && goPackage != "":
 			// replace existing go_package
 			lines[i] = goPackageLine
@@ -100,4 +101,18 @@ func replaceImport(line string, importFunc func(string) string) string {
 	}
 
 	return fmt.Sprintf(`import "%s";`, importFunc(parts[1]))
+}
+
+func replacePackage(line string, packageFunc func(string) string) string {
+	if packageFunc == nil {
+		return line
+	}
+
+	parts := strings.Split(line, " ")
+	if len(parts) < 2 {
+		// Won't happen unless there's a syntax error
+		return line
+	}
+
+	return fmt.Sprintf(`package %s;`, packageFunc(strings.TrimSuffix(parts[1], ";")))
 }
