@@ -15,6 +15,9 @@ type ProtoFilePatcher struct {
 	// specify a function that returns the go_package option the patched proto file will use
 	PatchGoPackage func(path string) string
 
+	// specify a function that can manipulate any line in the proto file
+	PatchLines func(line string) string
+
 	// the root of the vendor dir where the proto files will be patched recursively
 	RootDir string
 	// patch files matching these patterns
@@ -35,8 +38,11 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 	}
 
 	for _, fileToPatch := range filesToPatch {
-		goPackageForFile := p.PatchGoPackage(strings.TrimPrefix(fileToPatch, p.RootDir))
-		if err := PatchProtoFile(fileToPatch, goPackageForFile); err != nil {
+		var goPackageForFile string
+		if p.PatchGoPackage != nil {
+			goPackageForFile = p.PatchGoPackage(strings.TrimPrefix(fileToPatch, p.RootDir))
+		}
+		if err := PatchProtoFile(fileToPatch, goPackageForFile, p.PatchLines); err != nil {
 			return err
 		}
 	}
@@ -44,10 +50,7 @@ func (p ProtoFilePatcher) PatchProtoFiles() error {
 	return nil
 }
 
-func PatchProtoFile(path, goPackage string) error {
-	if goPackage == "" {
-		return nil
-	}
+func PatchProtoFile(path, goPackage string, patchLine func(string) string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -57,17 +60,20 @@ func PatchProtoFile(path, goPackage string) error {
 	goPackageLine := `option go_package = "` + goPackage + `";`
 	var packageDeclarationLine int
 	var replaced bool
-	for i, line := range lines {
+	for i := range lines {
+		if patchLine != nil {
+			lines[i] = patchLine(lines[i])
+		}
 		switch {
-		case strings.HasPrefix(line, "package"):
+		case strings.HasPrefix(lines[i], "package"):
 			packageDeclarationLine = i
-		case strings.HasPrefix(line, "option go_package"):
+		case strings.HasPrefix(lines[i], "option go_package") && goPackage != "":
 			// replace existing go_package
 			lines[i] = goPackageLine
 			replaced = true
 		}
 	}
-	if !replaced {
+	if !replaced && goPackage != "" {
 		// insert after syntax line
 		lines = append(lines[:packageDeclarationLine+1], append([]string{"\n" + goPackageLine}, lines[packageDeclarationLine+1:]...)...)
 	}
