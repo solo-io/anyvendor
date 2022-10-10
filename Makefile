@@ -25,9 +25,9 @@ init:
 .PHONY: update-deps
 update-deps: mod-download
 	mkdir -p $(DEPSGOBIN)
-	PATH=$(DEPSGOBIN):$$PATH go get golang.org/x/tools/cmd/goimports
-	PATH=$(DEPSGOBIN):$$PATH go get github.com/golang/protobuf/protoc-gen-go
-	PATH=$(DEPSGOBIN):$$PATH go get github.com/envoyproxy/protoc-gen-validate
+	PATH=$(DEPSGOBIN):$$PATH go install golang.org/x/tools/cmd/goimports
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/golang/protobuf/protoc-gen-go
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/envoyproxy/protoc-gen-validate
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/envoyproxy/protoc-gen-validate
 	PATH=$(DEPSGOBIN):$$PATH go get github.com/golang/mock/gomock
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/golang/mock/mockgen
