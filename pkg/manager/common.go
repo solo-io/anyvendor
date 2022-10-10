@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"unicode"
 
 	"github.com/mattn/go-zglob"
@@ -112,6 +113,14 @@ func NewDefaultCopier() *copier {
 }
 
 func (c *copier) Copy(src, dst string) (int64, error) {
+	for _, skip := range c.skipDirs {
+		if !strings.Contains(src, skip) {
+			continue
+		}
+		// don't copy skip matches
+		return 0, nil
+	}
+
 	log.Printf("copying %v -> %v", src, dst)
 
 	if err := c.fs.MkdirAll(filepath.Dir(dst), os.ModePerm); err != nil {

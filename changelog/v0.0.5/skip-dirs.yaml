@@ -1,0 +1,4 @@
+changelog:
+- type: FIX
+  description: Don't copy configured skip directories.
+  issueLink: https://github.com/solo-io/anyvendor/issues/17
