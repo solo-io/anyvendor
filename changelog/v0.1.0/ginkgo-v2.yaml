@@ -2,7 +2,7 @@ changelog:
   - type: DEPENDENCY_BUMP
     dependencyOwner: onsi
     dependencyRepo: ginkgo
-    dependencyTag: v2.1.3
+    dependencyTag: v2.5.0
   - type: NON_USER_FACING
     description: |
       - Upgrade to go 1.18

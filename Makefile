@@ -31,7 +31,7 @@ update-deps: mod-download
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/envoyproxy/protoc-gen-validate
 	PATH=$(DEPSGOBIN):$$PATH go get github.com/golang/mock/gomock
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/golang/mock/mockgen
-	PATH=$(DEPSGOBIN):$$PATH go install github.com/onsi/ginkgo/v2/ginkgo
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/onsi/ginkgo/v2/ginkgo@v2.5.0
 
 
 .PHONY: mod-download
