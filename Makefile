@@ -31,11 +31,11 @@ update-deps: mod-download
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/envoyproxy/protoc-gen-validate
 	PATH=$(DEPSGOBIN):$$PATH go get github.com/golang/mock/gomock
 	PATH=$(DEPSGOBIN):$$PATH go install github.com/golang/mock/mockgen
-	PATH=$(DEPSGOBIN):$$PATH go install github.com/onsi/ginkgo/ginkgo
+	PATH=$(DEPSGOBIN):$$PATH go install github.com/onsi/ginkgo/v2/ginkgo@v2.5.0
 
 
 .PHONY: mod-download
-mod-download:
+mod-download: check-go-version
 	go mod download
 
 #----------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ mod-download:
 #----------------------------------------------------------------------------------
 
 .PHONY: generated-code
-generated-code: $(OUTPUT_DIR)/.generated-code
+generated-code: check-go-version $(OUTPUT_DIR)/.generated-code
 
 SUBDIRS:=pkg anyvendor
 $(OUTPUT_DIR)/.generated-code:
@@ -64,3 +64,8 @@ run-tests:
 		-race \
 		-compilers=4 \
 		-skipPackage=$(SKIP_PACKAGES) $(TEST_PKG)
+
+# makes sure you are running codegen with the correct Go version
+.PHONY: check-go-version
+check-go-version:
+	./ci/check-go-version.sh

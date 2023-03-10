@@ -1,0 +1,12 @@
+changelog:
+  - type: DEPENDENCY_BUMP
+    dependencyOwner: onsi
+    dependencyRepo: ginkgo
+    dependencyTag: v2.5.0
+  - type: NON_USER_FACING
+    description: |
+      - Upgrade to go 1.18
+  - type: BREAKING_CHANGE
+    description: Bump to Ginkgo v2, which will break projects using anyvendor and Ginkgo v1
+    issueLink: https://github.com/solo-io/dev-portal/issues/2613
+    resolvesIssue: false
