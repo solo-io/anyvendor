@@ -1,0 +1,5 @@
+changelog:
+  - type: NON_USER_FACING
+    issueLink: 
+    resolvesIssue: false
+    description: FileCopier.GetMatches() returns an error message that contains missing path now.  

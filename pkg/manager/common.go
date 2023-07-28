@@ -16,8 +16,8 @@ import (
 )
 
 /*
-	This interface is used to abstract away the methods which require ENV vars or other
-	system things. This is mostly for unit testing purposes.
+This interface is used to abstract away the methods which require ENV vars or other
+system things. This is mostly for unit testing purposes.
 */
 type FileCopier interface {
 	Copy(src, dst string) (int64, error)
@@ -37,7 +37,7 @@ func (c *copier) GetMatches(copyPat []string, dir string) ([]string, error) {
 	for _, pat := range copyPat {
 		matches, err := zglob.Glob(filepath.Join(dir, pat))
 		if err != nil {
-			return nil, eris.Wrapf(err, "Error! glob match failure")
+			return nil, eris.Wrapf(err, "Error! glob match failure for path: %s", filepath.Join(dir, pat))
 		}
 		// Filter out all matches which contain a vendor folder, those are leftovers from a previous run.
 		// Might be worth clearing the vendor folder before every run.
