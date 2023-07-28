@@ -19,7 +19,10 @@ jobs:
         with:
           go-version: 1.18
       - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+        #  this will need to change to v2 when we move to protoc >= 3.20
+        #  protoc version will need to change to minor.patch too
+        #  see https://github.com/arduino/setup-protoc/pull/78
+        uses: arduino/setup-protoc@v1
         with:
           version: '3.15.8'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,7 +44,10 @@ jobs:
         with:
           go-version: 1.18
       - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+        #  this will need to change to v2 when we move to protoc >= 3.20
+        #  protoc version will need to change to minor.patch too
+        #  see https://github.com/arduino/setup-protoc/pull/78
+        uses: arduino/setup-protoc@v1 
         with:
           version: '3.15.8'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
