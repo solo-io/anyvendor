@@ -1,0 +1,5 @@
+changelog:
+  - type: NON_USER_FACING
+    issueLink: 
+    resolvesIssue: false
+    description: Bumped up protoc version to 3.15.8 
