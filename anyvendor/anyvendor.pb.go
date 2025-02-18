@@ -22,11 +22,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Config object used for running anyvendor. The top level config consists of 2 main sections.
 //
-//Config object used for running anyvendor. The top level config consists of 2 main sections.
-//
-//Local is a set of matchers will be taken directly from the local module, and vendored in.
-//Imports is a list of import types which will be run, and then vendored.
+// Local is a set of matchers will be taken directly from the local module, and vendored in.
+// Imports is a list of import types which will be run, and then vendored.
 type Config struct {
 	// files to be vendored from current repo
 	Local *Local `protobuf:"bytes,1,opt,name=local,proto3" json:"local,omitempty"`
@@ -240,15 +239,14 @@ func (m *Local) GetPatterns() []string {
 	return nil
 }
 
+// A go mod import represents a set of imports from a go module
 //
-//A go mod import represents a set of imports from a go module
+// patterns is a set glob matchers to find files in a go module.
 //
-//patterns is a set glob matchers to find files in a go module.
+// package is the name of the go module which these should be pulled from.
 //
-//package is the name of the go module which these should be pulled from.
-//
-//The GoModImport uses the command `go list -f '{{.Path}}' -m  all` to find
-//all of the package names
+// The GoModImport uses the command `go list -f '{{.Path}}' -m  all` to find
+// all of the package names
 type GoModImport struct {
 	Patterns             []string `protobuf:"bytes,1,rep,name=patterns,proto3" json:"patterns,omitempty"`
 	Package              string   `protobuf:"bytes,2,opt,name=package,proto3" json:"package,omitempty"`
