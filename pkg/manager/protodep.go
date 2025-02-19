@@ -7,16 +7,16 @@ import (
 )
 
 /*
-	An internal only interface used to represent the different types of available sources
-	for non-go vendored files.
+An internal only interface used to represent the different types of available sources
+for non-go vendored files.
 */
 type depFactory interface {
 	Ensure(ctx context.Context, opts *anyvendor.Config) error
 }
 
 /*
-	The manager is the external facing object that will be responsible for ensuring
-	a given anyvendor config, as outlined by the `anyvendor.Config` object.
+The manager is the external facing object that will be responsible for ensuring
+a given anyvendor config, as outlined by the `anyvendor.Config` object.
 */
 type Manager struct {
 	depFactories []depFactory

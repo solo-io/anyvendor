@@ -1,6 +1,6 @@
 module github.com/solo-io/anyvendor
 
-go 1.18
+go 1.24
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v0.6.1

@@ -14,10 +14,11 @@ jobs:
       - uses: actions/checkout@v3
       - run: |
           git fetch --prune --unshallow
-      - name: Set up Go 1.18
+      - name: Set up Go 
         uses: actions/setup-go@v4
         with:
-          go-version: 1.18
+          go-version-file: "go.mod"
+          
       - name: Install Protoc
         #  this will need to change to v2 when we move to protoc >= 3.20
         #  protoc version will need to change to minor.patch too
@@ -39,10 +40,10 @@ jobs:
       - uses: actions/checkout@v3
       - run: |
           git fetch --prune --unshallow
-      - name: Set up Go 1.18
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.18
+          go-version-file: "go.mod"
       - name: Install Protoc
         #  this will need to change to v2 when we move to protoc >= 3.20
         #  protoc version will need to change to minor.patch too

@@ -63,7 +63,7 @@ func (r *GitRepository) Vendor(cache *GitVendorCache, vendorDir string) error {
 		copiedFileSuffix := filepath.Join(repoRelativePath, cachedFile[len(cachedRepoDir):])
 		copiedFile := filepath.Join(vendorDir, copiedFileSuffix)
 		if _, err := fileCopier.Copy(cachedFile, copiedFile); err != nil {
-			return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
+			return eris.Wrap(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
 				err.Error(), cachedFile))
 		}
 	}

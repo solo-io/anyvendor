@@ -175,7 +175,7 @@ func (m *goModFactory) copy(modules []*moduleWithImports) error {
 				localPath := strings.TrimPrefix(vendorFile, m.WorkingDirectory+"/")
 				localFile := filepath.Join(m.WorkingDirectory, anyvendor.DefaultDepDir, mod.module.Path, localPath)
 				if _, err := m.fileCopier.Copy(vendorFile, localFile); err != nil {
-					return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
+					return eris.Wrap(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
 						err.Error(), vendorFile))
 				}
 			}
@@ -184,7 +184,7 @@ func (m *goModFactory) copy(modules []*moduleWithImports) error {
 				localPath := filepath.Join(mod.module.Path, vendorFile[len(mod.module.Dir):])
 				localFile := filepath.Join(m.WorkingDirectory, anyvendor.DefaultDepDir, localPath)
 				if _, err := m.fileCopier.Copy(vendorFile, localFile); err != nil {
-					return eris.Wrapf(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
+					return eris.Wrap(err, fmt.Sprintf("Error! %s - unable to copy file %s\n",
 						err.Error(), vendorFile))
 				}
 			}
