@@ -11,11 +11,11 @@ jobs:
     name: check-code-gen
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
       - run: |
           git fetch --prune --unshallow
       - name: Set up Go 
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4.3.0
         with:
           go-version-file: "go.mod"
           
@@ -23,7 +23,7 @@ jobs:
         #  this will need to change to v2 when we move to protoc >= 3.20
         #  protoc version will need to change to minor.patch too
         #  see https://github.com/arduino/setup-protoc/pull/78
-        uses: arduino/setup-protoc@v1
+        uses: arduino/setup-protoc@149f6c87b92550901b26acd1632e11c3662e381f # v1.3.0
         with:
           version: '3.15.8'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,18 +37,18 @@ jobs:
     name: unit-tests
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
       - run: |
           git fetch --prune --unshallow
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4.3.0
         with:
           go-version-file: "go.mod"
       - name: Install Protoc
         #  this will need to change to v2 when we move to protoc >= 3.20
         #  protoc version will need to change to minor.patch too
         #  see https://github.com/arduino/setup-protoc/pull/78
-        uses: arduino/setup-protoc@v1 
+        uses: arduino/setup-protoc@149f6c87b92550901b26acd1632e11c3662e381f # v1.3.0
         with:
           version: '3.15.8'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
